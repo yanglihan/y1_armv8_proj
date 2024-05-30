@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdint.h>
 
 union reg {
   int64_t x;
