@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 typedef uint32_t instr;
 typedef uint32_t seg; // using seg for a segment of instructions
@@ -20,6 +21,70 @@ struct
 
 int main(int argc, char **argv)
 {
+  char *input_filename, *output_filename;
+  if (argc == 1)
+  {
+    input_filename = argv[0];
+  }
+  else if (argc == 2)
+  {
+    input_filename = argv[0];
+    output_filename = argv[1];
+  }
+  else
+  {
+    return EXIT_FAILURE;
+  }
+
+  
+  FILE *input_file = fopen(input_filename, "rb");
+  instr buffer;
+  seg op0;
+
+  while(!feof(input_file)) {
+    fread(buffer, sizeof(buffer), 1, input_file);
+    op0 = take_bits(buffer, 25, 4);
+    if (op0 & 0b1110 == 0b1000) // data processing (immediate)
+    {
+      dpi(buffer);
+    }
+    else if (op0 & 0b0111 == 0b0101) // data processing (register)
+    {
+      dpr(buffer);
+    }
+    else if (op0 & 0b0101 == 0b0100) // loads and stores
+    {
+      ls(buffer);
+    }
+    else if (op0 & 0b1110 == 0b1010) // branches
+    {
+      br(buffer);
+    }
+    else if (op0 == 0x8a000000) // halting
+    {
+      break;
+    }
+  }
+  fclose(input_file);
+
+  if (output_filename)
+  {
+    FILE *output_file = fopen(output_filename, "w");
+    fprintf("Registers:\n", output_file);
+    for (int i = 0; i < 31; i++)
+    {
+      printf("X%02d    = %016x\n", i, r[i].x);
+    }
+    printf("PC     = %016x\n", pc.x);
+    printf("PSTATE : %c%c%c%c\n", pstate.n ? 'N' : '-', pstate.z ? 'Z' : '-', pstate.c ? 'C' : '-', pstate.v ? 'V' : '-');
+    printf("Non-zero memory:\n");
+    // TODO: scan non-zero memory
+  }
+  else
+  {
+    // TODO: terminal output in the above format
+  }
+  
 
   return EXIT_SUCCESS;
 }
@@ -402,3 +467,7 @@ uint64_t bit_shift64(seg opr, uint64_t oprand, int shift_amount)
   }
   return 0;
 }
+
+
+void ls(instr instr);
+void br(instr instr);
