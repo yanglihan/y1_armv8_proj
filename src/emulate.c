@@ -6,15 +6,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MEM_SIZE 0x200000 // 2MB of memory
-uint8_t mem[MEM_SIZE];
+uint8_t mem[MEM_SIZE]; // memory
 
-reg_t r[32], *zr = r + 31, pc, sp;
+reg_t r[32], *zr = r + 31, pc; // registers
 
 struct
 {
-  bool n, z, c, v;
-} pstate = {0, 1, 0, 0};
+  int n : 1, z : 1, c : 1, v : 1;
+} pstate = {0, 1, 0, 0}; // p-states
 
 uint64_t mem64_load(addr_t addr)
 {
@@ -143,7 +142,7 @@ void dpi(instr_t instr) // data processing (immediate)
       }
       else // 32-bit
       {
-        rd->upper[1] = 0;
+        rd->UPPER = 0;
         rd->w = rn->w + (int32_t)imm12;
       }
       break;
@@ -158,7 +157,7 @@ void dpi(instr_t instr) // data processing (immediate)
       }
       else // 32-bit
       {
-        rd->upper[1] = 0;
+        rd->UPPER = 0;
         rd->w = rn->w + (int32_t)imm12;
         pstate.n = take_bits(rd, 31, 1);
         pstate.z = (rd->uw == 0);
@@ -173,7 +172,7 @@ void dpi(instr_t instr) // data processing (immediate)
       }
       else // 32-bit
       {
-        rd->upper[1] = 0;
+        rd->UPPER = 0;
         rd->w = rn->w - (int32_t)imm12;
       }
       break;
@@ -188,7 +187,7 @@ void dpi(instr_t instr) // data processing (immediate)
       }
       else // 32-bit
       {
-        rd->upper[1] = 0;
+        rd->UPPER = 0;
         rd->w = rn->w - (int32_t)imm12;
         pstate.n = take_bits(rd, 31, 1);
         pstate.z = (rd->uw == 0);
@@ -208,7 +207,7 @@ void dpi(instr_t instr) // data processing (immediate)
       }
       else // 32-bit
       {
-        rd->upper[1] = 0;
+        rd->UPPER = 0;
         rd->uw = ~(uint32_t)imm16;
       }
       break;
@@ -219,7 +218,7 @@ void dpi(instr_t instr) // data processing (immediate)
       }
       else // 32-bit
       {
-        rd->upper[1] = 0;
+        rd->UPPER = 0;
         rd->uw = (uint32_t)imm16;
       }
       break;
@@ -230,7 +229,7 @@ void dpi(instr_t instr) // data processing (immediate)
       }
       else // 32-bit
       {
-        rd->upper[1] = 0;
+        rd->UPPER = 0;
         rd->uw = (uint32_t)imm16 | (rd->uw & ~((uint32_t)0xffff << (hw * 16)));
       }
       break;
@@ -269,7 +268,7 @@ void dpr(instr_t instr) // data processing (register)
         }
         else // 32-bit
         {
-          rd->upper[1] = 0;
+          rd->UPPER = 0;
           rd->w = ra->w + rn->w * rm->w;
         }
       }
@@ -281,7 +280,7 @@ void dpr(instr_t instr) // data processing (register)
         }
         else // 32-bit
         {
-          rd->upper[1] = 0;
+          rd->UPPER = 0;
           rd->w = ra->w - rn->w * rm->w;
         }
       }
@@ -308,7 +307,7 @@ void dpr(instr_t instr) // data processing (register)
         }
         else // 32-bit
         {
-          rd->upper[1] = 0;
+          rd->UPPER = 0;
           rd->w = rn->w + (int32_t)imm;
         }
         break;
@@ -323,7 +322,7 @@ void dpr(instr_t instr) // data processing (register)
         }
         else // 32-bit
         {
-          rd->upper[1] = 0;
+          rd->UPPER = 0;
           rd->w = rn->w + (int32_t)imm;
           pstate.n = take_bits(rd, 31, 1);
           pstate.z = (rd->uw == 0);
@@ -338,7 +337,7 @@ void dpr(instr_t instr) // data processing (register)
         }
         else // 32-bit
         {
-          rd->upper[1] = 0;
+          rd->UPPER = 0;
           rd->w = rn->w - (int32_t)imm;
         }
         break;
@@ -353,7 +352,7 @@ void dpr(instr_t instr) // data processing (register)
         }
         else // 32-bit
         {
-          rd->upper[1] = 0;
+          rd->UPPER = 0;
           rd->w = rn->w - (int32_t)imm;
           pstate.n = take_bits(rd, 31, 1);
           pstate.z = (rd->uw == 0);
@@ -397,7 +396,7 @@ void dpr(instr_t instr) // data processing (register)
         }
         else // 32-bit
         {
-          rd->upper[1] = 0;
+          rd->UPPER = 0;
           rd->uw = rn->uw & imm;
         }
         break;
@@ -408,7 +407,7 @@ void dpr(instr_t instr) // data processing (register)
         }
         else // 32-bit
         {
-          rd->upper[1] = 0;
+          rd->UPPER = 0;
           rd->uw = rn->uw | imm;
         }
         break;
@@ -419,7 +418,7 @@ void dpr(instr_t instr) // data processing (register)
         }
         else // 32-bit
         {
-          rd->upper[1] = 0;
+          rd->UPPER = 0;
           rd->uw = rn->uw ^ imm;
         }
         break;
@@ -434,7 +433,7 @@ void dpr(instr_t instr) // data processing (register)
         }
         else // 32-bit
         {
-          rd->upper[1] = 0;
+          rd->UPPER = 0;
           rd->uw = rn->uw & imm;
           pstate.n = take_bits(rd, 31, 1);
           pstate.z = (rd->uw == 0);
@@ -513,7 +512,7 @@ void ls(instr_t instr) // loads and stores
     }
     else // 32-bit
     {
-      rt->upper[1] = 0;
+      rt->UPPER = 0;
       rt->uw = mem32_load(addr);
     }
   }
