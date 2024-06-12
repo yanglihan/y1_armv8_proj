@@ -17,15 +17,15 @@
 typedef union
 {
   int64_t     x;
-  // int32_t  w; this is implemented as a macro using half
+  // int32_t  w; implemented as a macro using half
   uint64_t    ux;
-  // uint32_t uw; this is implemented as a macro using uhalf
+  // uint32_t uw; implemented as a macro using uhalf
   int32_t     half[2];
   uint32_t    uhalf[2];
 } reg_t;
 
 typedef uint32_t instr_t;   // 32-bit instruction
-typedef uint32_t seg_t;     // segment of an instruction
+typedef uint64_t seg_t;     // segment of an instruction
 typedef uint64_t addr_t;    // memory address
 
 // load a 64-bit data at addr
@@ -43,11 +43,11 @@ extern void mem32_store(addr_t addr, uint32_t data);
 // take a segment of a binary starting from begin of size size
 extern inline uint64_t take_bits(void *from, int begin, int size);
 
-// shift 32-bit oprand by shift_amount under the mode described in opr
-extern uint32_t bit_shift32(seg_t opr, seg_t oprand, int shift_amount);
+// shift 32-bit operand by shift_amount under the mode described in opr
+extern uint32_t bit_shift32(seg_t opr, seg_t operand, int shift_amount);
 
-// shift 64-bit oprand by shift_amount under the mode described in opr
-extern uint64_t bit_shift64(seg_t opr, uint64_t oprand, int shift_amount);
+// shift 64-bit operand by shift_amount under the mode described in opr
+extern uint64_t bit_shift64(seg_t opr, uint64_t operand, int shift_amount);
 
 // data processing (immediate)
 extern void dpi(instr_t instr);
@@ -63,3 +63,6 @@ extern void br(instr_t instr);
 
 // print all registers and non-zero memories
 extern void print_state();
+
+// print all registers and non-zero memories
+extern void fprint_state(FILE *out);
