@@ -1,10 +1,9 @@
 #include "bitwise.h"
-#include "datatype.h"
 
 // take a segment of a binary starting from begin of size size
-inline uint64_t take_bits(void *from, int begin, int size)
+uint64_t take_bits(void* from, int begin, int size)
 {
-  uint64_t i = *(uint64_t *)from;
+  uint64_t i = *(uint64_t*)from;
   i >>= begin;
   i &= (1 << size) - 1;
   return i;

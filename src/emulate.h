@@ -1,37 +1,27 @@
-#include <stdbool.h>
-#include <stdint.h>
+#ifndef EMULATOR_H
+#define EMULATOR_H
+
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "datatypes.h"
-#include "bitwise.h"
+#include "emulator_util/datatypes.h"
+#include "emulator_util/memory.h"
+#include "emulator_util/interpret.h"
+#include "emulator_util/io.h"
 
-// load a 64-bit data at addr
-extern uint64_t mem64_load(addr_t addr);
+// #define LINE_BY_LINE_PRINT_DEBUG // to print the resulting state after each instruction (warning: affects performance)
+// #define DEBUG                    // for general debugging
 
-// store a 64-bit data at addr
-extern void mem64_store(addr_t addr, uint64_t data);
+#ifdef LINE_BY_LINE_PRINT_DEBUG
+#define debug_print_state() print_state()
+#else
+#define debug_print_state()
+#endif
 
-// load a 32-bit data from addr
-extern uint32_t mem32_load(addr_t addr);
+#ifdef DEBUG
+#define debug_printf(fstr, ...) printf(fstr, __VA_ARGS__)
+#else
+#define debug_printf(fstr, ...)
+#endif
 
-// store a 32-bit data at addr
-extern void mem32_store(addr_t addr, uint32_t data);
-
-// data processing (immediate)
-extern void dpi(instr_t instr);
-
-// data processing (register)
-extern void dpr(instr_t instr);
-
-// loads and stores
-extern void ls(instr_t instr);
-
-// branches
-extern void br(instr_t instr);
-
-// print all registers and non-zero memories
-extern void print_state();
-
-// print all registers and non-zero memories
-extern void fprint_state(FILE *out);
+#endif

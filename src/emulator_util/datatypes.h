@@ -1,9 +1,9 @@
+// datatypes related to armv8
+#ifndef DATATYPES_H
+#define DATATYPES_H
+
 #include <stdint.h>
 
-#ifndef DATATYPES
-#define DATATYPES
-
-#define MEM_SIZE (0x200000)   // 2MB of memory
 #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
 #define UPPER uhalf[0]       // to access upper half of a 64-bit register
 #define w     half[1]
@@ -14,7 +14,14 @@
 #define uw    uhalf[0]
 #endif
 
-typedef union
+// pstate
+typedef struct
+{
+  unsigned int n : 1, z : 1, c : 1, v : 1;
+} pstate_t;
+
+// general register
+typedef union reg
 {
   int64_t     x;
   // int32_t  w; implemented as a macro using half
