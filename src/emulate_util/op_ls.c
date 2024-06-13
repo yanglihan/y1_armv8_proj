@@ -20,7 +20,7 @@ void ls(instr_t instr)
 
   if (!take_bits(&instr, 31, 1)) // load literal
   {
-    offset = (int64_t)((uint64_t)simm19 << 45) >> 45;
+    offset = sgnext64(simm19, 45);
     addr = pc.x + offset * 4;
     load = 1;
   }
@@ -28,7 +28,7 @@ void ls(instr_t instr)
   {
     if (take_bits(&instr, 24, 1)) // unsigned
     {
-      offset = (int64_t)((uint64_t)imm12 << 52) >> 52;
+      offset = sgnext64(imm12, 52);
       if (sf) // 64-bit
       {
         addr = xn->ux + offset * 8;
@@ -51,7 +51,7 @@ void ls(instr_t instr)
     }
     else // pre/post-index
     {
-      offset = (int64_t)((uint64_t)simm9 << 55) >> 55;
+      offset = sgnext64(simm9, 55);
       if (sf) // 64-bit
       {
         addr = xn->ux + i * offset;

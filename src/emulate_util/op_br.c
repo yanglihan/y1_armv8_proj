@@ -10,38 +10,39 @@ void br(instr_t instr)
   int8_t exec;
   switch (take_bits(&instr, 30, 2))
   {
-  case 0b00: // unconditional
-    offset = (int64_t)((uint64_t)simm26 << 38) >> 38; // sign ext
+  case BR_UNCOND: // unconditional
+    offset = sgnext64(simm26, 38);
     PC += offset * 4; // jump to specified offset
     break;
 
-  case 0b01: // conditional
-    offset = (int64_t)((uint64_t)simm19 << 45) >> 45; // sign ext
+  case BR_COND: // conditional
+    offset = sgnext64(simm19, 45);
     cond = take_bits(&instr, 0, 4);
-    exec = 0;
     switch (cond)
     {
-    case 0b0000: // eq
+    case BR_COND_EQ: // eq
       exec = pstate.z == 1;
       break;
-    case 0b0001: // ne
+    case BR_COND_NE: // ne
       exec = pstate.z != 1;
       break;
-    case 0b1010: // ge
+    case BR_COND_GE: // ge
       exec = pstate.n == pstate.v;
       break;
-    case 0b1011: // lt
+    case BR_COND_LT: // lt
       exec = pstate.n != pstate.v;
       break;
-    case 0b1100: // gt
+    case BR_COND_GT: // gt
       exec = !pstate.z && pstate.n == pstate.v;
       break;
-    case 0b1101: // le
+    case BR_COND_LE: // le
       exec = pstate.z || pstate.n != pstate.v;
       break;
-    case 0b1110: // al
+    case BR_COND_AL: // al
       exec = 1;
       break;
+    default:
+      exec = 0;
     }
     if (exec) // condition fulfilled
     {
@@ -53,7 +54,7 @@ void br(instr_t instr)
     }
     break;
 
-  case 0b11: // register
+  case BR_REG: // register
   {
     seg_t xn = take_bits(&instr, 5, 5);
     PC = (r + xn)->uw; // jump to address stored in register

@@ -7,6 +7,9 @@
 
 #include "datatypes.h"
 
+#define sgnext64(opr, by)  (int64_t)((uint64_t)opr << by) >> by
+#define sgnext32(opr, by)  (int32_t)((uint32_t)opr << by) >> by
+
 // take a segment of a binary starting from begin of size size
 extern uint64_t take_bits(void* from, int begin, int size);
 

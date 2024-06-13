@@ -18,10 +18,10 @@ void dpi(instr_t instr)
 
   switch (opi)
   {
-  case 0b010: // arithmatic operation
+  case DPI_OPI_AR: // arithmatic operation
     switch (opc)
     {
-    case 0b00: // add
+    case DPI_OPC_ADD: // add
       if (sf)  // 64-bit
       {
         rd->x = rn->x + ((int64_t)imm12);
@@ -32,7 +32,7 @@ void dpi(instr_t instr)
         rd->w = rn->w + ((int32_t)imm12);
       }
       break;
-    case 0b01: // adds
+    case DPI_OPC_ADDS: // adds
       if (sf)  // 64-bit
       {
         rd->ux = rn->ux + ((uint64_t)imm12);
@@ -51,7 +51,7 @@ void dpi(instr_t instr)
         pstate.v = (INT32_MAX - ((int32_t)imm12) < rn->w);
       }
       break;
-    case 0b10: // sub
+    case DPI_OPC_SUB: // sub
       if (sf)  // 64-bit
       {
         rd->x = rn->x - ((int64_t)imm12);
@@ -62,7 +62,7 @@ void dpi(instr_t instr)
         rd->w = rn->w - ((int32_t)imm12);
       }
       break;
-    case 0b11: // subs
+    case DPI_OPC_SUBS: // subs
       if (sf)  // 64-bit
       {
         rd->x = rn->x - ((int64_t)imm12);
@@ -83,10 +83,10 @@ void dpi(instr_t instr)
       break;
     }
     break;
-  case 0b101: // wide move operation
+  case DPI_OPI_WM: // wide move operation
     switch (opc)
     {
-    case 0b00: // movn
+    case DPI_OPC_MOVN: // movn
       if (sf)  // 64-bit
       {
         rd->ux = ~((uint64_t)imm16);
@@ -97,7 +97,7 @@ void dpi(instr_t instr)
         rd->uw = ~((uint32_t)imm16);
       }
       break;
-    case 0b10: // movz
+    case DPI_OPC_MOVZ: // movz
       if (sf)  // 64-bit
       {
         rd->ux = ((uint64_t)imm16);
@@ -108,7 +108,7 @@ void dpi(instr_t instr)
         rd->uw = ((uint32_t)imm16);
       }
       break;
-    case 0b11: // movk
+    case DPI_OPC_MOVK: // movk
       if (sf)  // 64-bit
       {
         rd->ux = ((uint64_t)imm16) | (rd->ux & ~((uint64_t)0xffff << (hw * 16)));

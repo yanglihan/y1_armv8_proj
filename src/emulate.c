@@ -1,5 +1,25 @@
+#include <stdio.h>
+#include <stdlib.h>
 
-#include "emulate.h"
+#include "emulate_util/datatypes.h"
+#include "emulate_util/memory.h"
+#include "emulate_util/interpret.h"
+#include "emulate_util/io.h"
+
+// #define LINE_BY_LINE_PRINT_DEBUG // to print the resulting state after each instruction (warning: affects performance)
+// #define DEBUG                    // for general debugging
+
+#ifdef LINE_BY_LINE_PRINT_DEBUG
+#define debug_print_state() print_state()
+#else
+#define debug_print_state()
+#endif
+
+#ifdef DEBUG
+#define debug_printf(fstr, ...) printf(fstr, __VA_ARGS__)
+#else
+#define debug_printf(fstr, ...)
+#endif
 
 int main(int argc, char** argv)
 {

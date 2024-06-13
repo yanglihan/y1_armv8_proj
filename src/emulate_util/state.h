@@ -10,6 +10,11 @@
 #define CUR_INSTR   (mem32_load(pc.ux)) // current instruction
 #define RESET_ZR    zr->ux = 0          // reset zero register
 
+#define P_FLG_N     (pstate.n ? 'N' : '-')
+#define P_FLG_Z     (pstate.z ? 'Z' : '-')
+#define P_FLG_C     (pstate.c ? 'C' : '-')
+#define P_FLG_V     (pstate.v ? 'V' : '-')
+
 // registers
 extern reg_t r[32], * zr, pc;
 

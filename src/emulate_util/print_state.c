@@ -8,16 +8,16 @@ void print_state(void)
   {
     printf("X%02d    = %016llx\n", i, r[i].ux); // e.g. "X05    = 00000000ffffffc4\n"
   }
-  printf("PC     = %016x\n", PC);             // e.g. "PC     = 00000000ffffffc4\n"
-  printf("PSTATE : %c%c%c%c\n", pstate.n ? 'N' : '-', pstate.z ? 'Z' : '-', pstate.c ? 'C' : '-', pstate.v ? 'V' : '-');
-  // e.g. "PSTATE : Z-C-\n"
+  printf("PC     = %016x\n", PC);               // e.g. "PC     = 00000000ffffffc4\n"
+  printf("PSTATE : %c%c%c%c\n", P_FLG_N, P_FLG_Z, P_FLG_C, P_FLG_V);
+                                                // e.g. "PSTATE : Z-C-\n"
   printf("Non-zero memory:\n");
   for (int64_t i = 0; i < MEM_SIZE; i += 4)
   {
     uint64_t m = mem32_load(i);
     if (m) // non-zero memory
     {
-      printf("%#010llx: %08llx\n", i, m);         // e.g. "0x00000004: 00a30b92\n"
+      printf("%#010llx: %08llx\n", i, m);       // e.g. "0x00000004: 00a30b92\n"
     }
   }
 }
@@ -30,9 +30,9 @@ void fprint_state(FILE* out)
   {
     fprintf(out, "X%02d    = %016llx\n", i, r[i].ux); // e.g. "X05    = 00000000ffffffc4\n"
   }
-  fprintf(out, "PC     = %016x\n", PC);             // e.g. "PC     = 00000000ffffffc4\n"
-  fprintf(out, "PSTATE : %c%c%c%c\n", pstate.n ? 'N' : '-', pstate.z ? 'Z' : '-', pstate.c ? 'C' : '-', pstate.v ? 'V' : '-');
-  // e.g. "PSTATE : Z-C-\n"
+  fprintf(out, "PC     = %016x\n", PC);               // e.g. "PC     = 00000000ffffffc4\n"
+  fprintf(out, "PSTATE : %c%c%c%c\n",  P_FLG_N, P_FLG_Z, P_FLG_C, P_FLG_V);
+                                                      // e.g. "PSTATE : Z-C-\n"
   fprintf(out, "Non-zero memory:\n");
   for (uint64_t i = 0; i < MEM_SIZE; i += 4)
   {
@@ -41,6 +41,6 @@ void fprint_state(FILE* out)
     {
       continue;
     }
-    fprintf(out, "%#010llx: %08llx\n", i, m);         // e.g. "0x00000004: 00a30b92\n"
+    fprintf(out, "%#010llx: %08llx\n", i, m);           // e.g. "0x00000004: 00a30b92\n"
   }
 }
