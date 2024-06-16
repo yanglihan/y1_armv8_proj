@@ -36,3 +36,4 @@ assemble
 #ignore
 .DS_Store
 .vscode
+.editorconfig
