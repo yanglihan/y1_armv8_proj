@@ -1,5 +1,6 @@
 #include "op_br.h"
 
+#include "../common/consts.h"
 #include "bitwise.h"
 #include "state.h"
 

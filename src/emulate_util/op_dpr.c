@@ -1,5 +1,6 @@
 #include "op_dpr.h"
 
+#include "../common/consts.h"
 #include "bitwise.h"
 #include "state.h"
 

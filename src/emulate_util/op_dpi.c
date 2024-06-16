@@ -1,5 +1,6 @@
 #include "op_dpi.h"
 
+#include "../common/consts.h"
 #include "bitwise.h"
 #include "state.h"
 
