@@ -4,8 +4,6 @@
 
 #include <stdio.h>
 
-#include "state.h"
-
 // print all registers and non-zero memories
 extern void print_state(void);
 

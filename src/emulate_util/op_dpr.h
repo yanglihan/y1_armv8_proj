@@ -2,9 +2,7 @@
 #ifndef OP_DPR_H
 #define OP_DPR_H
 
-#include "datatypes.h"
-#include "state.h"
-#include "bitwise.h"
+#include "../common/datatypes.h"
 
 #define C_DPR_OPR_MULT(opr) (0b1000)
 #define C_DPR_OPR_AR(opr)   ((opr & 0b1001) == 0b1000)

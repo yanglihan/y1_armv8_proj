@@ -2,9 +2,7 @@
 #ifndef OP_DPI_H
 #define OP_DPI_H
 
-#include "datatypes.h"
-#include "state.h"
-#include "bitwise.h"
+#include "../common/datatypes.h"
 
 #define DPI_OPI_AR      (0b010)
 #define DPI_OPI_WM      (0b101)

@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "emulate_util/datatypes.h"
-#include "emulate_util/memory.h"
+#include "common/datatypes.h"
 #include "emulate_util/interpret.h"
 #include "emulate_util/io.h"
+#include "emulate_util/memory.h"
+#include "emulate_util/state.h"
 
 // #define LINE_BY_LINE_PRINT_DEBUG // to print the resulting state after each instruction (warning: affects performance)
 // #define DEBUG                    // for general debugging
@@ -34,7 +35,7 @@ int main(int argc, char** argv)
   }
   else
   {
-    printf("Invalid number of arguments!\nExpected: emulate input_file [output_file]\n");
+    printf("Invalid number of arguments!\nExpected: %s input_file [output_file]\n", argv[0]);
     return EXIT_SUCCESS;
   }
 

@@ -1,5 +1,8 @@
 #include "op_dpr.h"
 
+#include "bitwise.h"
+#include "state.h"
+
 // data processing (register)
 void dpr(instr_t instr)
 {

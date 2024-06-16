@@ -1,5 +1,8 @@
 #include "op_dpi.h"
 
+#include "bitwise.h"
+#include "state.h"
+
 // data processing (immediate)
 void dpi(instr_t instr)
 {

@@ -2,8 +2,7 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include "datatypes.h"
-#include "memory.h"
+#include "../common/datatypes.h"
 
 #define PC          (pc.uw)             // uniformed access to program counter
 #define PC_INC      pc.uw += 4          // program counter increment

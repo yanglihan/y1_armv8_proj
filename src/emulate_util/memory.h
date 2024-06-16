@@ -2,9 +2,7 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
-#include <stdio.h>
-
-#include "datatypes.h"
+#include "../common/datatypes.h"
 
 #define MEM_SIZE (0x200000)   // 2MB of memory
 

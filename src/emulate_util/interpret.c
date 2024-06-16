@@ -1,5 +1,11 @@
 #include "interpret.h"
 
+#include "bitwise.h"
+#include "op_dpi.h"
+#include "op_dpr.h"
+#include "op_ls.h"
+#include "op_br.h"
+
 // interpret an instruction
 int interpret(instr_t instr)
 {

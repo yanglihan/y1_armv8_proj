@@ -1,5 +1,9 @@
 #include "print_state.h"
 
+#include "../common/datatypes.h"
+#include "state.h"
+#include "memory.h"
+
 // print all registers and non-zero memories to terminal
 void print_state(void)
 {

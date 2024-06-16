@@ -1,5 +1,9 @@
 #include "op_ls.h"
 
+#include "bitwise.h"
+#include "memory.h"
+#include "state.h"
+
 // loads and stores
 void ls(instr_t instr)
 {

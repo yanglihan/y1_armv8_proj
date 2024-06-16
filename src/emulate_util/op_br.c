@@ -1,5 +1,8 @@
 #include "op_br.h"
 
+#include "bitwise.h"
+#include "state.h"
+
 // branches
 void br(instr_t instr)
 {

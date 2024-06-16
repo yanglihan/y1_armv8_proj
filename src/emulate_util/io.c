@@ -1,5 +1,9 @@
 #include "io.h"
 
+#include <stdio.h>
+#include "memory.h"
+#include "print_state.h"
+
 // write to terminal, always returns success
 int write_terminal(void) {
   print_state();

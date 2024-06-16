@@ -3,9 +3,7 @@
 #ifndef BITWISE_H
 #define BITWISE_H
 
-#include <stdint.h>
-
-#include "datatypes.h"
+#include "../common/datatypes.h"
 
 #define sgnext64(opr, by)  (int64_t)((uint64_t)opr << by) >> by
 #define sgnext32(opr, by)  (int32_t)((uint32_t)opr << by) >> by

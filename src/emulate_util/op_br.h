@@ -2,9 +2,7 @@
 #ifndef OP_BR_H
 #define OP_BR_H
 
-#include "datatypes.h"
-#include "state.h"
-#include "bitwise.h"
+#include "../common/datatypes.h"
 
 #define BR_COND_EQ  (0b0000)
 #define BR_COND_NE  (0b0001)

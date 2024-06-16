@@ -2,10 +2,6 @@
 #ifndef IO_H
 #define IO_H
 
-#include <stdio.h>
-
-#include "print_state.h"
-
 #define IO_SUCCESS (0)
 #define IO_FAILURE (1)
 
