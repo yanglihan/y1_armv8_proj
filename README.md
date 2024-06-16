@@ -11,11 +11,11 @@ Members: Yang, Lihan; Chen, Henry; Wang, Andy; Ye, Zihao
     - **/src/assemble_util**: the utilities for assemble
 
 Important headers:
-- **common/consts.h**
-- **common/datatypes.h**
-- **emulate_util/operations.h**
-- **assemble_util/operations.h**
-- **assemble_util/stdutil.h**
+- **/common/consts.h**
+- **/common/datatypes.h**
+- **/emulate_util/operations.h**
+- **/assemble_util/operations.h**
+- **/assemble_util/stdutil.h**
 
 ## Notes
 
