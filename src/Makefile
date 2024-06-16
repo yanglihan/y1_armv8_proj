@@ -1,16 +1,15 @@
 CC      ?= gcc
-CFLAGS  ?= -std=c17 -g\
-	-D_POSIX_SOURCE -D_DEFAULT_SOURCE\
+CFLAGS  ?= -std=c17 -g -v\
 	-Wall -Werror -pedantic
 
 .SUFFIXES: .c .o
 
 .PHONY: all clean
 
-all: assemble emulate emulate_util/*
+all: assemble emulate
 
-assemble: assemble.o
-emulate: emulate.o
+assemble: assemble_util/*.c assemble.o
+emulate: emulate_util/*.c emulate.o
 
 clean:
 	$(RM) *.o assemble emulate

@@ -1,9 +1,6 @@
 #include "branch.h"
 
-#include <assert.h>
-#include <inttypes.h>
-#include <string.h>
-
+#include "stdutil.h"
 #include "../common/consts.h"
 
 // get condition code

@@ -1,24 +1,24 @@
 #include "op_dpi.h"
 
-#include "../common/consts.h"
 #include "bitwise.h"
 #include "state.h"
+#include "../common/consts.h"
 
 // data processing (immediate)
 void dpi(instr_t instr)
 {
-  seg_t sf = take_bits(&instr, 31, 1);
-  seg_t opc = take_bits(&instr, 29, 2);
-  seg_t opi = take_bits(&instr, 23, 3);
-  seg_t operand = take_bits(&instr, 5, 18);
-  seg_t rdi = take_bits(&instr, 0, 5);
+  seg_t sf = bitfield(&instr, 31, 1);
+  seg_t opc = bitfield(&instr, 29, 2);
+  seg_t opi = bitfield(&instr, 23, 3);
+  seg_t operand = bitfield(&instr, 5, 18);
+  seg_t rdi = bitfield(&instr, 0, 5);
   reg_t *rd = r + rdi;
-  seg_t sh = take_bits(&instr, 22, 1);
-  seg_t imm12 = take_bits(&instr, 10, 12) << (sh * 12);
-  seg_t rni = take_bits(&instr, 5, 5);
+  seg_t sh = bitfield(&instr, 22, 1);
+  seg_t imm12 = bitfield(&instr, 10, 12) << (sh * 12);
+  seg_t rni = bitfield(&instr, 5, 5);
   reg_t *rn = r + rni;
-  seg_t hw = take_bits(&instr, 21, 2);
-  seg_t imm16 = take_bits(&instr, 5, 16) << (hw * 16);
+  seg_t hw = bitfield(&instr, 21, 2);
+  seg_t imm16 = bitfield(&instr, 5, 16) << (hw * 16);
 
   switch (opi)
   {
@@ -40,7 +40,7 @@ void dpi(instr_t instr)
       if (sf)  // 64-bit
       {
         rd->ux = rn->ux + ((uint64_t)imm12);
-        pstate.n = take_bits(rd, 63, 1);
+        pstate.n = bitfield(rd, 63, 1);
         pstate.z = (rd->ux == 0);
         pstate.c = (UINT64_MAX - (imm12) < rn->ux);
         pstate.v = (INT64_MAX - ((int64_t)imm12) < rn->x);
@@ -49,7 +49,7 @@ void dpi(instr_t instr)
       {
         rd->UPPER = 0;
         rd->uw = rn->uw + ((uint32_t)imm12);
-        pstate.n = take_bits(rd, 31, 1);
+        pstate.n = bitfield(rd, 31, 1);
         pstate.z = (rd->uw == 0);
         pstate.c = (UINT32_MAX - (imm12) < rn->uw);
         pstate.v = (INT32_MAX - ((int32_t)imm12) < rn->w);
@@ -70,7 +70,7 @@ void dpi(instr_t instr)
       if (sf)  // 64-bit
       {
         rd->x = rn->x - ((int64_t)imm12);
-        pstate.n = take_bits(rd, 63, 1);
+        pstate.n = bitfield(rd, 63, 1);
         pstate.z = (rd->ux == 0);
         pstate.c = !((imm12) > rn->ux);
         pstate.v = (INT64_MIN + ((int64_t)imm12) > rn->x);
@@ -79,7 +79,7 @@ void dpi(instr_t instr)
       {
         rd->UPPER = 0;
         rd->w = rn->w - ((int32_t)imm12);
-        pstate.n = take_bits(rd, 31, 1);
+        pstate.n = bitfield(rd, 31, 1);
         pstate.z = (rd->uw == 0);
         pstate.c = !((imm12) > rn->uw);
         pstate.v = (INT32_MIN + ((int32_t)imm12) > rn->w);

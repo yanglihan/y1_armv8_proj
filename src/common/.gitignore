@@ -15,7 +15,6 @@
 
 #ignore junk files from compiling C code
 *.o
-*.exe
 emulate
 assemble
 
@@ -38,4 +37,3 @@ assemble
 .DS_Store
 .vscode
 .editorconfig
-test.dSYM

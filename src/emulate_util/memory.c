@@ -3,7 +3,7 @@
 uint8_t mem[MEM_SIZE]; // memory
 
 // load a 64-bit data at addr
-uint64_t mem64_load(addr_t addr)
+uint64_t mload64(addr_t addr)
 {
   if (addr + 7 >= MEM_SIZE)
   {
@@ -18,7 +18,7 @@ uint64_t mem64_load(addr_t addr)
 }
 
 // store a 64-bit data at addr
-void mem64_store(addr_t addr, uint64_t data)
+void mstore64(addr_t addr, uint64_t data)
 {
   if (addr + 7 >= MEM_SIZE)
   {
@@ -31,7 +31,7 @@ void mem64_store(addr_t addr, uint64_t data)
 }
 
 // load a 32-bit data from addr
-uint32_t mem32_load(addr_t addr)
+uint32_t mload32(addr_t addr)
 {
   if (addr + 3 >= MEM_SIZE)
   {
@@ -46,7 +46,7 @@ uint32_t mem32_load(addr_t addr)
 }
 
 // store a 32-bit data at addr
-void mem32_store(addr_t addr, uint32_t data)
+void mstore32(addr_t addr, uint32_t data)
 {
   if (addr + 3 >= MEM_SIZE)
   {
@@ -56,4 +56,10 @@ void mem32_store(addr_t addr, uint32_t data)
   {
     mem[addr + i] = (data >> (8 * i)) & 0xFF;
   }
+}
+
+// load memory from a file input
+int memfread(FILE *in)
+{
+  return fread(mem, MEM_SIZE, 1, in);
 }

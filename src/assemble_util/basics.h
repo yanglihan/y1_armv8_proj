@@ -4,8 +4,6 @@
 
 #include "../common/datatypes.h"
 
-#include "basics.h"
-
 // data processing (immediate)
 extern instr_t dpi(seg_t sf, seg_t opc, seg_t opi, seg_t operand, seg_t rd);
 

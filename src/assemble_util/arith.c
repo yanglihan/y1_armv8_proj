@@ -1,7 +1,6 @@
 #include "arith.h"
 
-#include <assert.h>
-#include <inttypes.h>
+#include "stdutil.h"
 
 // converts an arithmetic operation to binary
 instr_t arith(char **args, int argc, int8_t flg, int8_t sub)

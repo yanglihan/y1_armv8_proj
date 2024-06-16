@@ -1,7 +1,6 @@
 #include "move.h"
 
-#include <assert.h>
-#include <inttypes.h>
+#include "stdutil.h"
 
 // converts a wide move operation to binary
 instr_t move(char **args, int argc, seg_t opc)

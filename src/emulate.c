@@ -1,11 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "common/datatypes.h"
 #include "emulate_util/interpret.h"
 #include "emulate_util/io.h"
 #include "emulate_util/memory.h"
 #include "emulate_util/state.h"
+#include "common/datatypes.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 // #define LINE_BY_LINE_PRINT_DEBUG // to print the resulting state after each instruction (warning: affects performance)
 // #define DEBUG                    // for general debugging
@@ -39,7 +38,7 @@ int main(int argc, char** argv)
     return EXIT_SUCCESS;
   }
 
-  if (load_program(argv[1])) // load program
+  if (fload(argv[1])) // load program
   {
     printf("Invalid input file!\n");
     return EXIT_SUCCESS;
@@ -58,14 +57,14 @@ int main(int argc, char** argv)
 
   if (argc == 3) // file output
   {
-    if (write_file(argv[2])) {
+    if (fout(argv[2])) {
       printf("Invalid output file! The program will now use terminal output.\n");
-      write_terminal();
+      tout();
     }
   }
   else // terminal output
   {
-    write_terminal();
+    tout();
   }
 
   return EXIT_SUCCESS;

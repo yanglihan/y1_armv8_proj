@@ -1,16 +1,13 @@
 #include "interpret.h"
 
 #include "bitwise.h"
-#include "op_dpi.h"
-#include "op_dpr.h"
-#include "op_ls.h"
-#include "op_br.h"
+#include "operations.h"
 
 // interpret an instruction
 int interpret(instr_t instr)
 {
     seg_t op0;
-    op0 = take_bits(&instr, 25, 4);
+    op0 = bitfield(&instr, 25, 4);
     if (C_INSTR_HALT(instr)) // halting
     {
         return 1;

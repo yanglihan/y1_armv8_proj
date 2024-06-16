@@ -1,7 +1,9 @@
 #include "bitwise.h"
 
+#include "../common/consts.h"
+
 // take a segment of a binary starting from begin of size size
-uint64_t take_bits(void* from, int begin, int size)
+uint64_t bitfield(void* from, int begin, int size)
 {
   uint64_t i = *(uint64_t*)from;
   i >>= begin;
@@ -9,43 +11,43 @@ uint64_t take_bits(void* from, int begin, int size)
   return i;
 }
 
-// shift 32-bit operand by shift_amount under the mode described in opr
-uint32_t bit_shift32(seg_t opr, seg_t operand, int shift_amount)
+// shift 32-bit operand by n under the mode described in shift
+uint32_t bitshift32(seg_t shift, seg_t operand, int n)
 {
-  switch (opr & 0b0110)
+  switch (shift)
   {
-  case 0b0000: // lsl
-    return operand << shift_amount;
+  case SHIFT_LSL: // lsl
+    return operand << n;
     break;
-  case 0b0010: // lsr
-    return operand >> shift_amount;
+  case SHIFT_LSR: // lsr
+    return operand >> n;
     break;
-  case 0b0100: // asr
-    return (operand >> shift_amount) | (take_bits(&operand, 31, 1) * (UINT32_MAX << (32 - shift_amount)));
+  case SHIFT_ASR: // asr
+    return (operand >> n) | (bitfield(&operand, 31, 1) * (UINT32_MAX << (32 - n)));
     break;
-  case 0b0110: // ror
-    return (operand >> shift_amount) | (operand << (32 - shift_amount));
+  case SHIFT_ROR: // ror
+    return (operand >> n) | (operand << (32 - n));
     break;
   }
   return 0;
 }
 
-// shift 64-bit operand by shift_amount under the mode described in opr
-uint64_t bit_shift64(seg_t opr, uint64_t operand, int shift_amount)
+// shift 64-bit operand by n under the mode described in shift
+uint64_t bitshift64(seg_t shift, uint64_t operand, int n)
 {
-  switch (opr & 0b0110)
+  switch (shift)
   {
-  case 0b0000: // lsl
-    return operand << shift_amount;
+  case SHIFT_LSL: // lsl
+    return operand << n;
     break;
-  case 0b0010: // lsr
-    return operand >> shift_amount;
+  case SHIFT_LSR: // lsr
+    return operand >> n;
     break;
-  case 0b0100: // asr
-    return (operand >> shift_amount) | (take_bits(&operand, 63, 1) * (UINT64_MAX << (64 - shift_amount)));
+  case SHIFT_ASR: // asr
+    return (operand >> n) | (bitfield(&operand, 63, 1) * (UINT64_MAX << (64 - n)));
     break;
-  case 0b0110: // ror
-    return (operand >> shift_amount) | (operand << (64 - shift_amount));
+  case SHIFT_ROR: // ror
+    return (operand >> n) | (operand << (64 - n));
     break;
   }
   return 0;

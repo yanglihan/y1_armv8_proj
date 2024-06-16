@@ -1,10 +1,9 @@
 #include "multi.h"
 
-#include <assert.h>
-#include <inttypes.h>
+#include "stdutil.h"
 
 // converts a multiplication operation to binary
-instr_t multiply(char **args, int argc, int8_t sub)
+instr_t multi(char **args, int argc, int8_t sub)
 {
   assert(argc == 4);
 

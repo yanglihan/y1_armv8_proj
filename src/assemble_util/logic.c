@@ -1,7 +1,6 @@
 #include "logic.h"
 
-#include <assert.h>
-#include <inttypes.h>
+#include "stdutil.h"
 
 instr_t logic(char **args, int argc, seg_t opc, seg_t n)
 {

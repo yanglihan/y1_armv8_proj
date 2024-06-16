@@ -1,18 +1,18 @@
 #include "op_br.h"
 
-#include "../common/consts.h"
 #include "bitwise.h"
 #include "state.h"
+#include "../common/consts.h"
 
 // branches
 void br(instr_t instr)
 {
-  seg_t simm26 = take_bits(&instr, 0, 26);
-  seg_t simm19 = take_bits(&instr, 5, 19);
+  seg_t simm26 = bitfield(&instr, 0, 26);
+  seg_t simm19 = bitfield(&instr, 5, 19);
   int64_t offset;
   seg_t cond;
   int8_t exec;
-  switch (take_bits(&instr, 30, 2))
+  switch (bitfield(&instr, 30, 2))
   {
   case BR_UNCOND: // unconditional
     offset = sgnext64(simm26, 38);
@@ -21,7 +21,7 @@ void br(instr_t instr)
 
   case BR_COND: // conditional
     offset = sgnext64(simm19, 45);
-    cond = take_bits(&instr, 0, 4);
+    cond = bitfield(&instr, 0, 4);
     switch (cond)
     {
     case BR_COND_EQ: // eq
@@ -60,7 +60,7 @@ void br(instr_t instr)
 
   case BR_REG: // register
   {
-    seg_t xn = take_bits(&instr, 5, 5);
+    seg_t xn = bitfield(&instr, 5, 5);
     PC = (r + xn)->uw; // jump to address stored in register
   }
   break;

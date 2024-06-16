@@ -6,12 +6,12 @@
 #define IO_FAILURE (1)
 
 // write to terminal, always returns success
-int write_terminal(void);
+int tout(void);
 
 // write to file, returns failure if output file is invalid
-int write_file(char* path);
+int fout(char* path);
 
 // load a program to memory, returns failure if input file is invalid
-int load_program(char* path);
+int fload(char* path);
 
 #endif

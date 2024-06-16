@@ -1,6 +1,6 @@
 // loads and stores operation
-#ifndef DPI_H
-#define DPI_H
+#ifndef OP_LS_H
+#define OP_LS_H
 
 #include "../common/datatypes.h"
 

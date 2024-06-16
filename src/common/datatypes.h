@@ -17,7 +17,7 @@
 // pstate
 typedef struct
 {
-  unsigned int n : 1, z : 1, c : 1, v : 1;
+  uint8_t n, z, c, v;
 } pstate_t;
 
 // general register

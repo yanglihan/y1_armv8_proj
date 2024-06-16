@@ -1,5 +1,4 @@
 // bitwise operations
-
 #ifndef BITWISE_H
 #define BITWISE_H
 
@@ -9,12 +8,12 @@
 #define sgnext32(opr, by)  (int32_t)((uint32_t)opr << by) >> by
 
 // take a segment of a binary starting from begin of size size
-extern uint64_t take_bits(void* from, int begin, int size);
+extern uint64_t bitfield(void* from, int begin, int size);
 
-// shift 32-bit operand by shift_amount under the mode described in opr
-extern uint32_t bit_shift32(seg_t opr, seg_t operand, int shift_amount);
+// shift 32-bit operand by n under the mode described in shift
+extern uint32_t bitshift32(seg_t shift, seg_t operand, int n);
 
-// shift 64-bit operand by shift_amount under the mode described in opr
-extern uint64_t bit_shift64(seg_t opr, uint64_t operand, int shift_amount);
+// shift 64-bit operand by n under the mode described in shift
+extern uint64_t bitshift64(seg_t shift, uint64_t operand, int n);
 
 #endif

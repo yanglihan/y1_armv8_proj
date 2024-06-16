@@ -2,11 +2,12 @@
 #ifndef STATE_H
 #define STATE_H
 
+#include "memory.h"
 #include "../common/datatypes.h"
 
 #define PC          (pc.uw)             // uniformed access to program counter
 #define PC_INC      pc.uw += 4          // program counter increment
-#define CUR_INSTR   (mem32_load(pc.ux)) // current instruction
+#define CUR_INSTR   (mload32(pc.ux))    // current instruction
 #define RESET_ZR    zr->ux = 0          // reset zero register
 
 #define P_FLG_N     (pstate.n ? 'N' : '-')
