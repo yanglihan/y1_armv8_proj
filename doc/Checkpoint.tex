@@ -4,27 +4,61 @@
 
 \begin{document}
 
-\title{ARM Checkpoint... }
-\author{TODO}
+\title{ARMv8 Interim Checkpoint Report}
+\author{Group 29}
 
 \maketitle
 
 \section{Group Organisation}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+The group consist of 4 members, Lihan Yang, Henry Chen, Andy Wang, and Zihao Ye. We formed the Emulator Team (Lihan and Henry) and the Assembler Team (Andy and Zihao) so that each team is responsible for the codes for their part of the project. Additionally, the two Teams conduct code review for their counterparts to achieve the highest level of rigour.
+
+Within the Emulator Team, Lihan will implement Sections 1.4, 1.5 and 1.6, and Henry Sections 1.7 and 1.8. Upon the completion of both parts, Lihan will merge the two sub-parts, implementing the \texttt{main} function and maintaining consistent code style. The Assembler Team will then look through the code and ensure all features in the specification are implemented and correct. Henry will be responsible for the final testing and debugging with the test suite. The implementation of the Assembler will follow a similar structure.
+
+The written reports are overseen by Lihan, with each member producing the paragraphs related to their respective work.
 
 \section{Implementation Strategies}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+\subsection{Program Structure}
+
+We are structuring our \texttt{emulator.c} into four parts. The first part is global variables storing the state of the processor. The second part is \textit{secondary functions} which performs basic operations. The third part is \textit{primary functions}, each responsible for carrying out completely a 32-bit instruction. Finally, the \texttt{main} function controls the main loop. The \texttt{main} function only calls \textit{primary functions} (except for fetching the next instruction using the program counter), and the \textit{primary functions} use \textit{secondary functions} and the global variables to perform their respective tasks. The details are as follows:
+
+\begin{itemize}
+    \item The type \texttt{union reg} (\texttt{reg\_t}) represents a 64-bit single register, with members \texttt{int64\_t x}, \texttt{int32\_t w}, \texttt{uint64\_t ux} and \texttt{uint32\_t uw} for 64-bit and 32-bit, signed and unsigned data access (with a special member \texttt{upper} to clear the upper 32 bits when 32-bit mode is used).
+
+    \item Types \texttt{instr\_t} and \texttt{seg\_t} as aliases of \texttt{uint32\_t} represent 32-bit instructions and segments of instructions, and \texttt{addr\_t} as an alias of \texttt{uint64\_t} to represent memory addresses. They make the natures of variables and arguments more recognisable.
+    
+    \item Variables \texttt{r[32]}, \texttt{zr} and \texttt{pc} represent all register used in the Emulator. The 31 general registers are \texttt{r[0]} to \texttt{r[30]}, whereas the zero register \texttt{zr} is a reference to \texttt{r[31]} to facilitate its access through address \texttt{0b11111}. The program counter \texttt{pc} has the same type as a general register. P-states are represented by a variable \texttt{pstate} of an anonymous \texttt{struct} members \texttt{bool n, z, c, v}, initialised to \texttt{\{0, 1, 0, 0\}}.
+    
+    \item The variable \texttt{uint8\_t mem[0x200000]} stores the 2MB memory. We use functions \texttt{mem64\_load}, \texttt{mem64\_store}, \texttt{mem32\_load} and \texttt{mem32\_store} to provide different access modes to the memory.
+
+    \item The function \texttt{take\_bits} extracts specific bits from a binary number. It is usually used with input of type \texttt{instr\_t} while it can also handle inputs of any other length.
+
+    \item Functions \texttt{bit\_shift64} and \texttt{bit\_shift32} perform bit-wise shifts. These functions take arguments \texttt{opr} (the shift type), \texttt{operand} and \texttt{shift\_amount}.
+    
+    \item \textit{Primary functions} \texttt{dpi}, \texttt{dpr}, \texttt{ls} and \texttt{br} perform data processing (immediate), data processing (register), single data transfer, and branch operations, each with an \texttt{instr\_t} as input.
+
+    \item A \texttt{main} function for input/output, and calling the respective functions depending on the next instruction pointed to by \texttt{pc}.
+\end{itemize}
+
+We have additionally made a terminal version of \texttt{main} where the program can take terminal input (in hex format) as instruction for more flexible testing and debugging.
+
+We plan to convert the Emulator code to the Assembler code by turning conditions of conditional statements into statements generating machine codes, while preserving the structure of the program.
+
+\subsection{Challenges}
+
+During the process, we encountered challenges from the following areas:
+
+\begin{itemize}
+    \item Difficulty in testing: VS Code does not support convenient change of launch arguments, so locating anomalies with its debug mode has been inefficient. As a solution we made an alternative version of the Emulator specifically for testing, which prints the resulting states after each instruction, and values of key arguments taken from the instruction.
+
+    \item Difficulty in reviewing code: Due to the complexity of the program, locating and verifying program flows in the specification has been difficult for reviewers. This is partly mitigated by the detailed comments used in our code, while some features (e.g. signed extension) proved more comprehensible in verbal communication. We therefore plan to have more in person meetings in the following weeks.
+
+    \item Use of Git: Several mistakes made during merges caused some confusion during the early period. As all group members have become more familiar with Git commands, we are not experiencing such problems at the moment.
+\end{itemize}
+
+\section{Summary}
+
+We consider the overall progress of the Emulator smooth and relatively fast, with seamless communication and cooperation between group members. No significant hindrance has been encountered and we are confident in meeting all deadlines set for this project.
 
 \end{document}
