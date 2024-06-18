@@ -50,4 +50,6 @@ Macros beginning with C_ are predicates.
 #define SHIFT_ASR       (0b10)
 #define SHIFT_ROR       (0b11)
 
+#define LINELENGTH      (400)
+
 #endif
