@@ -32,7 +32,7 @@ setoff:
 
 finally:
     movz    w0, #0
-    ldr     w5, spimask
+    ldr     w5, freqmask
     tst     w9, w5
     add     x23, pc, #4
     b.ne    chncycl
@@ -103,7 +103,7 @@ ledcol2ctrl:
 swiaddr:
     .int    0x3f200034
 
-spimask:
+freqmask:
     .int    0x00310000
 
 colmask:
