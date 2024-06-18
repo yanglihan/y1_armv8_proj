@@ -1,6 +1,6 @@
 #include "move.h"
 
-#include "stdutil.h"
+#include "asmutil.h"
 
 // converts a wide move operation to binary
 instr_t move(char **args, int argc, seg_t opc)

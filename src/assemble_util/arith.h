@@ -1,4 +1,4 @@
-// arithmetic operation compiler
+// arithmetic operation assembler
 #ifndef ARITH_H
 #define ARITH_H
 

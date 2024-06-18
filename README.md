@@ -15,7 +15,7 @@ Important headers:
 - **/common/datatypes.h**
 - **/emulate_util/operations.h**
 - **/assemble_util/operations.h**
-- **/assemble_util/stdutil.h**
+- **/assemble_util/asmutil.h**
 
 ## Notes
 
@@ -25,7 +25,7 @@ Important headers:
     > `#include "common/datatypes.h"`<br>
     > `#include <stdio.h>`
 1. Use **operations.h** instead of a long list of includes, but only for the same level of operations, e.g. **arith.h** is included in **operations.h**, but **basics.h** is not.
-1. Standard library headers used widely in assembler operations are stored in **stdutil.h**. Do not include string-related headers separately.
+1. Standard library headers used widely in assembler operations are stored in **asmutil.h**. Do not include string-related headers separately.
 1. Add a one-line description at the beginning of any .h file.
 1. Use shorthands to name functions and variables. As much as possible, avoid underscores. This project does not use camelcase.
 1. Store numeric constants in **common/consts.h** and include in the .c file.

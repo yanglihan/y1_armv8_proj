@@ -1,6 +1,6 @@
 #include "multi.h"
 
-#include "stdutil.h"
+#include "asmutil.h"
 
 // converts a multiplication operation to binary
 instr_t multi(char **args, int argc, int8_t sub)

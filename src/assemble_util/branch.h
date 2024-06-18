@@ -1,4 +1,4 @@
-// branch operation compiler
+// branch operation assembler
 #ifndef BRANCH_H
 #define BRANCH_H
 

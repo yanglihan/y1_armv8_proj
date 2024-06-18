@@ -1,6 +1,6 @@
 #include "branch.h"
 
-#include "stdutil.h"
+#include "asmutil.h"
 #include "../common/consts.h"
 
 // get condition code
