@@ -1,6 +1,6 @@
 #include "logic.h"
 
-#include "stdutil.h"
+#include "asmutil.h"
 
 instr_t logic(char **args, int argc, seg_t opc, seg_t n)
 {

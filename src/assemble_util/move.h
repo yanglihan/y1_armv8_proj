@@ -1,4 +1,4 @@
-// wide move operation compiler
+// wide move operation assembler
 #ifndef MOVE_H
 #define MOVE_H
 

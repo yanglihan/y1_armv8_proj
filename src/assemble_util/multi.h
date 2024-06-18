@@ -1,4 +1,4 @@
-// multiplication operation compiler
+// multiplication operation assembler
 #ifndef MULTI_H
 #define MULTI_H
 

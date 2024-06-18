@@ -1,6 +1,6 @@
 #include "ldstr.h"
 
-#include "stdutil.h"
+#include "asmutil.h"
 
 // calculates offset
 static int calculate_offset(const char *label)

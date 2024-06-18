@@ -1,4 +1,4 @@
-// logical operation compiler
+// logical operation assembler
 #ifndef LOGICS_H
 #define LOGICS_H
 
