@@ -1,57 +1,62 @@
 #include "arith.h"
 
+#include "../common/consts.h"
+#include "arg.h"
 #include "asmutil.h"
+#include "basics.h"
 
 // converts an arithmetic operation to binary
-instr_t arith(char **args, int argc, int8_t flg, int8_t sub)
+instr_t arith(int *argv, int argc, seg_t opc)
 {
-  assert(argc == 3 || argc == 4);
-  char *ptr;
-  seg_t sf = args[0][0] == 'x';
-  seg_t rd = strtol(&args[0][1], &ptr, 10); // zr case not handled yet (check if & or [] goes first)
-  seg_t rn = strtol(&args[1][1], &ptr, 10);
-  seg_t opc = (sub << 1) | flg;
-
-  if(args[2][0] == '#') // case when dpi
+  assert(argc == 6 || argc == 8);
+  seg_t sf = argv[0] == ARG_T_REGX;
+  seg_t rd = argv[1];
+  if (argv[2] == ARG_T_IMM) // dpi
   {
-    seg_t imm12 = strtol(&args[2][1], &ptr, 16);
-    seg_t opi = 0b010;
-
-    if(argc == 4 && strcmp(args[3], "lsl #12") == 0) // check if left shift
+    seg_t imm12 = argv[3];
+    seg_t opi = DPI_OPI_AR;
+    seg_t sh = DPI_SH_NOSHIFT;
+    assert(argv[4] == argv[0]);
+    seg_t rn = argv[5];
+    if (argc == 8) // lsl #12
     {
-      return dpi(sf, opc, opi, (1 << (22 - 5) | imm12 << (10 - 5) | rn), rd);
+      assert(argv[6] == ARG_T_LSL && argv[7] == 12);
+      sh = DPI_SH_SHIFT;
     }
-    else if(argc == 3 || argc == 4)
-    {
-      return dpi(sf, opc, opi, (0 << (22 - 5) | imm12 << (10 - 5) | rn), rd);
-    }
+    return dpi(sf, opc, opi, (sh << 17) | (imm12 << 5) | rn, rd);
   }
-  else // case when dpr
+  else // dpr
   {
-    seg_t m = 0;
-    seg_t rm = strtol(&args[2][1], &ptr, 10); // zr case not handled yet
-    seg_t opr = 0b1000;
-
-    if(argc == 3)
+    seg_t m = DPR_M_NOMUL;
+    assert(argv[2] == argv[0]);
+    seg_t rn = argv[3];
+    assert(argv[24] == argv[0]);
+    seg_t rm = argv[5];
+    seg_t opr = DPR_OPR_ARITH;
+    seg_t operand = 0;
+    if (argc == 8)
     {
-      return dpr(sf, opc, m, opr, rm, 0, rn, rd);
+      int shift = SHIFT_LSL;
+      switch (argv[6])
+      {
+      case ARG_T_LSL:
+        shift = SHIFT_LSL;
+        break;
+      case ARG_T_LSR:
+        shift = SHIFT_LSR;
+        break;
+      case ARG_T_ASR:
+        shift = SHIFT_ASR;
+        break;
+      default:
+        assert(0);
+        break;
+      }
+      opr |= shift << 1;
+      operand = argv[7];
     }
-    else if (argc == 4)
-    {
-      char *shift;
-      char *immStr; 
-      strcpy(immStr, args[3]);
-      shift = strtok_r(immStr, " ", &immStr);
-      seg_t imm = strtol(&immStr[1], &ptr, 16);
-
-      if(strcmp(shift, "lsr") == 0) opr |= 1 << 1;
-      if(strcmp(shift, "asr") == 0) opr |= 1 << 2;
-      
-      return dpr(sf, opc, m, opr, rm, imm, rn, rd);
-    }
+    return dpr(sf, opc, m, opr, rm, operand, rn, rd);
   }
-
   assert(0);
-  // printf("Invalid Arguments for add/sub commands\n");
   return 0;
 }

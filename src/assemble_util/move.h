@@ -5,6 +5,6 @@
 #include "../common/datatypes.h"
 
 // converts a wide move operation to binary
-extern instr_t move(char **args, int argc, seg_t opc);
+extern instr_t move(int *argv, int argc, seg_t opc);
 
 #endif

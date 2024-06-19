@@ -25,7 +25,7 @@ instr_t ll(seg_t sf, seg_t simm19, seg_t rt)
 }
 
 // branch
-instr_t br(seg_t operand)
+instr_t br(seg_t tmpl, seg_t simm26, seg_t xn, seg_t simm19, seg_t cond)
 {
-    return (0b0101 << 26) | operand;
+    return tmpl | simm26 | (xn << 5) | (simm19 << 5) | cond;
 }

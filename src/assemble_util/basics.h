@@ -17,6 +17,6 @@ extern instr_t sdt(seg_t sf, seg_t l, seg_t offset, seg_t xn, seg_t rt);
 extern instr_t ll(seg_t sf, seg_t simm19, seg_t rt);
 
 // branch
-extern instr_t br(seg_t operand);
+instr_t br(seg_t tmpl, seg_t simm26, seg_t xn, seg_t simm19, seg_t cond);
 
 #endif

@@ -1,43 +1,37 @@
 #include "symbol.h"
 
-#include "asmconst.h"
+#include "asmconsts.h"
 #include "asmutil.h"
-#include "../common/datatypes.h"
-#include <stdio.h>
 #include <stdlib.h>
 
 #define FORALLSYMB_I for (int i = 0; i < nsymb; i++)
 
 // stores one label and its address
 typedef struct symb {
-    char label[20];
+    char label[21];
     addr_t addr;
 } symb_t;
 
 symb_t *symbtbl; // the symbol table
 int nsymb = 0;  // the number of symbols
 
-int symbload(FILE *src)
+// add a label-address pair into the table, auto-remove the colon
+int symbadd(char *label, addr_t addr)
 {
-    char line[40];
-    int const maxlength = LINE_MAX_LENGTH;
-    for (int size; size = getline(line, &maxlength, src); size != -1)
+    char *colon;
+    assert(!existlabel(label));
+    symbtbl = realloc(symbtbl, sizeof(symb_t) * (nsymb + 1));
+    symbtbl[nsymb].addr = addr;
+    strncpy(symbtbl[nsymb].label, label, 20);
+    colon = strchr(symbtbl[nsymb].label, ':');
+    if (colon)
     {
-        if (size == 0)
-        {
-            continue;
-        }
-        
-        if (line[size - 2] == ':' && isalpha(line[0]))
-        {
-            char label[20];
-            
-        }
-        
+        *colon = '\0';
     }
-    return 0;
+    nsymb++;
 }
 
+// check if a label already exists
 int8_t existlabel(char *label)
 {
     FORALLSYMB_I
@@ -50,11 +44,13 @@ int8_t existlabel(char *label)
     return 0;
 }
 
-addr_t symbget(char *label)
+// get the address of a label
+addr_t symbget(char *label, int len)
 {
     FORALLSYMB_I
     {
-        if (strcmp(symbtbl[i].label, label))
+        
+        if (strncmp(symbtbl[i].label, label, len))
         {
             return symbtbl[i].addr;
         }
@@ -63,7 +59,9 @@ addr_t symbget(char *label)
     return 0;
 }
 
+// free the symbol table
 void freesymbtbl()
 {
     free(symbtbl);
 }
+

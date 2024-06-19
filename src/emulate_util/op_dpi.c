@@ -25,7 +25,7 @@ void dpi(instr_t instr)
   case DPI_OPI_AR: // arithmatic operation
     switch (opc)
     {
-    case DPI_OPC_ADD: // add
+    case ARITH_OPC_ADD: // add
       if (sf)  // 64-bit
       {
         rd->x = rn->x + ((int64_t)imm12);
@@ -36,7 +36,7 @@ void dpi(instr_t instr)
         rd->w = rn->w + ((int32_t)imm12);
       }
       break;
-    case DPI_OPC_ADDS: // adds
+    case ARITH_OPC_ADDS: // adds
       if (sf)  // 64-bit
       {
         rd->ux = rn->ux + ((uint64_t)imm12);
@@ -55,7 +55,7 @@ void dpi(instr_t instr)
         pstate.v = (INT32_MAX - ((int32_t)imm12) < rn->w);
       }
       break;
-    case DPI_OPC_SUB: // sub
+    case ARITH_OPC_SUB: // sub
       if (sf)  // 64-bit
       {
         rd->x = rn->x - ((int64_t)imm12);
@@ -66,7 +66,7 @@ void dpi(instr_t instr)
         rd->w = rn->w - ((int32_t)imm12);
       }
       break;
-    case DPI_OPC_SUBS: // subs
+    case ARITH_OPC_SUBS: // subs
       if (sf)  // 64-bit
       {
         rd->x = rn->x - ((int64_t)imm12);

@@ -1,57 +1,58 @@
 #include "ldstr.h"
 
+#include "../common/consts.h"
+#include "arg.h"
 #include "asmutil.h"
-
-// calculates offset
-static int calculate_offset(const char *label)
-{
-
-    return 0;
-}
+#include "basics.h"
 
 // converts a load/store operation to binary
-instr_t ldstr(char **args, int argc, int8_t load)
+instr_t ldstr(int *argv, int argc, seg_t load)
 {
-    assert(argc == 2 || argc == 3);
+    assert(argc == 4 || argc == 5 || argc == 6);
+    seg_t sf = argv[0] == ARG_T_REGX;
+    seg_t rt = argv[1];
 
-    char *ptr;
-    seg_t sf = args[0][0] == 'x';
-    seg_t rt = strtol(&args[0][1], &ptr, 10);
-    seg_t xn = 0;
-    seg_t offset = 0;
-    seg_t l = load ? 1 : 0;
-
-    if (args[1][0] == '[')
+    if (argv[2] == ARG_T_AIMM)
     {
-        char *addr = args[1];
-        if (sscanf(addr, "[x%d]", &xn) == 1)
+        assert(argc == 4);
+        seg_t offset = argv[3];
+        return ll(sf, offset, rt);
+    }
+    else if (argv[2] == ARG_T_APRE)
+    {
+        seg_t xn = argv[3];
+        seg_t offset = SDT_OFFS_TMPL_PRE | (argv[4] << 2);
+        return sdt(sf, load, offset, xn, rt);
+    }
+    else if (argv[2] == ARG_T_ARR)
+    {
+        seg_t xn = argv[3];
+        seg_t offset = SDT_OFFS_TMPL_REG | (argv[4] << 6);
+        return sdt(sf, load, offset, xn, rt);
+    }
+    else if (argv[2] == ARG_T_AREG)
+    {
+        seg_t xn = argv[3];
+        if (argc == 4)
         {
-            offset = 0;
-            return sdt(sf, l, offset, xn, rt);
-        }
-        else if (sscanf(addr, "[x%d, #%d]!", &xn, &offset) == 2)
-        {
-            return sdt(sf, l, offset, xn, rt);
-        }
-        else if (sscanf(addr, "[x%d], #%d", &xn, &offset) == 2)
-        {
-            return sdt(sf, l, offset, xn, rt);
-        }
-        else if (sscanf(addr, "[x%d, x%d]", &xn, &offset) == 2)
-        {
-            return sdt(sf, l, offset, xn, rt);
+            seg_t offset = SDT_OFFS_TMPL_IMM;
+            return sdt(sf, load, offset, xn, rt);
         }
         else
         {
-            assert(0);
-            // printf("Invalid Address Format\n");
-            return 0;
+            assert(argc == 6);
+            assert(argv[4] == ARG_T_IMM);
+            seg_t offset = SDT_OFFS_TMPL_POS | (argv[5] << 2);
+            return sdt(sf, load, offset, xn, rt);
         }
     }
-    else // literal address mode
+    else if (argv[2] == ARG_T_LIT)
     {
-        char *offsetstr = args[1];
-        offset = calculate_offset(offsetstr);
-        return sdt(sf, l, offset, xn, rt);
+        assert(load);
+        seg_t addr = argv[3];
+        return ll(sf, addr, rt);
     }
+    
+    assert(0);
+    return 0;
 }

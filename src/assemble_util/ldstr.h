@@ -3,6 +3,7 @@
 
 #include "../common/datatypes.h"
 
-extern instr_t ldstr(char **args, int argc, int8_t load);
+// converts a load/store operation to binary
+extern instr_t ldstr(int *argv, int argc, seg_t load);
 
 #endif

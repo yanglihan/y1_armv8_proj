@@ -1,69 +1,32 @@
 #include "branch.h"
 
+#include "arg.h"
 #include "asmutil.h"
+#include "basics.h"
 #include "../common/consts.h"
 
-// get condition code
-static seg_t cond_code(const char *cond)
-{
-    if (strcmp(cond, "eq") == 0)
-    {
-        return BR_COND_EQ;
-    }
-    if (strcmp(cond, "ne") == 0)
-    {
-        return BR_COND_NE;
-    }
-    if (strcmp(cond, "ge") == 0)
-    {
-        return BR_COND_GE;
-    }
-    if (strcmp(cond, "lt") == 0)
-    {
-        return BR_COND_LT;
-    }
-    if (strcmp(cond, "gt") == 0)
-    {
-        return BR_COND_GT;
-    }
-    if (strcmp(cond, "le") == 0)
-    {
-        return BR_COND_LE;
-    }
-    if (strcmp(cond, "al") == 0)
-    {
-        return BR_COND_AL;
-    }
-    assert(0);
-    return 0;
-}
-
 // converts a branch operation to binary
-instr_t branch(char **args, int argc)
+instr_t branch(int *argv, int argc, seg_t cond)
 {
-    assert(argc == 1 || argc == 2);
+    assert(argc == 2);
 
-    if (argc == 1) // b <literal>
+    if (argv[0] == ARG_T_REGX)
     {
-        char *label = args[0];
-        int offset = calculate_offset(label);
-        return br(offset);
+        seg_t xn = argv[1];
+        return br(BR_TMPL_REG, DEFAULT_NO_ARG, xn, DEFAULT_NO_ARG, DEFAULT_NO_ARG);
     }
-    else if (argc == 2)
+    else
     {
-        if (strcmp(args[0], "br") == 0) // br <Xn>
+        assert(argv[0] == ARG_T_LIT);
+        if (cond == BR_COND_AL)
         {
-            char *ptr;
-            seg_t xn = strtol(&args[1][1], &ptr, 10);
-            return br(xn);
+            seg_t simm26 = argv[1];
+            return br(BR_TMPL_UNC, simm26, DEFAULT_NO_ARG, DEFAULT_NO_ARG, DEFAULT_NO_ARG);
         }
-        else // b.cond <literal>
+        else
         {
-            char *cond = args[0];
-            char *label = args[1];
-            int offset = calculate_offset(label);
-            seg_t condition = cond_code(cond);
-            return br_cond(condition, offset);
+            seg_t simm19 = argv[1];
+            return br(BR_TMPL_CON, DEFAULT_NO_ARG, DEFAULT_NO_ARG, simm19, cond);
         }
     }
 

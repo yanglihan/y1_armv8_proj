@@ -17,6 +17,16 @@ typedef enum arg
     ARG_T_LSR,
     ARG_T_ASR,
     ARG_T_ROR,
+    ARG_T_LIT,
 } arg_t;
+
+// parse an integer regardless of base (10 or 16)
+void parseint(char **chrptr, int *buffer);
+
+// parse the index of a register
+void parsereg(char **chrptr, int *buffer);
+
+// parse all arguments in a given string, returns the number of arguments
+extern int parseall(char *line, int *argv);
 
 #endif

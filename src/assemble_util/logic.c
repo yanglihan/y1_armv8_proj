@@ -1,35 +1,44 @@
 #include "logic.h"
 
+#include "../common/consts.h"
+#include "arg.h"
 #include "asmutil.h"
+#include "basics.h"
 
-instr_t logic(char **args, int argc, seg_t opc, seg_t n)
+// converts a bit-wise logical operation to binary
+instr_t logic(int *argv, int argc, seg_t opc, seg_t n)
 {
-  assert(argc == 3 || argc == 4);
-  assert(n >> 1 == 0 && opc >> 2 == 0);
-  char *ptr;
-  seg_t sf = args[0][0] == 'x';
-  seg_t rd = strtol(&args[0][1], &ptr, 10);
-  seg_t rn = strtol(&args[1][1], &ptr, 10);
-  seg_t rm = strtol(&args[2][1], &ptr, 10);
-  seg_t m = 0;
-  seg_t opr = n;
-
-  if(argc == 3)
+  assert(argc == 6 || argc == 8);
+  seg_t sf = argv[0] == ARG_T_REGX;
+  seg_t rd = argv[1];
+  assert(argv[2] == argv[0]);
+  seg_t rn = argv[3];
+  assert(argv[4] == argv[0]);
+  seg_t rm = argv[5];
+  seg_t shift = DEFAULT_NO_ARG;
+  seg_t operand = DEFAULT_NO_ARG;
+  if (argc == 8)
   {
-    return dpr(sf, opc, m, opr, rm, 0, rn, rd);
+    switch (argv[6])
+    {
+    case ARG_T_LSL:
+      shift = SHIFT_LSL;
+      break;
+    case ARG_T_LSR:
+      shift = SHIFT_LSR;
+      break;
+    case ARG_T_ASR:
+      shift = SHIFT_ASR;
+      break;
+    case ARG_T_ROR:
+      shift = SHIFT_ROR;
+      break;
+    default:
+      assert(0);
+      break;
+    }
+    operand = argv[7];
   }
-  else
-  {
-    char *shiftType;
-    char *immStr;
-    strcpy(immStr, args[3]);
-    shiftType = strtok_r(immStr, " ", &immStr);
-    seg_t imm = strtol(&immStr[1], &ptr, 16);
-
-    if(strcmp(shiftType, "lsr") == 0) opr |= 1 << 1;
-    if(strcmp(shiftType, "asr") == 0) opr |= 1 << 2;
-    if(strcmp(shiftType, "ror") == 0) opr |= 0b11 << 1;
-
-    return dpr(sf, opc, m, opr, rm, imm, rn, rd);
-  }
+  seg_t opr = (shift << 1) | n;
+  return dpr(sf, opc, DPR_M_NOMUL, opr, rm, operand, rn, rd);
 }

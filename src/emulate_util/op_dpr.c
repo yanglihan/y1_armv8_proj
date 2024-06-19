@@ -24,7 +24,7 @@ void dpr(instr_t instr)
 
   if (m) // multiply operations
   {
-    if (C_DPR_OPR_MULT(opr)) // multiply
+    if (C_DPR_OPR_MUL(opr)) // multiply
     {
       if (!(operand & 0b100000)) // madd
       {
@@ -66,7 +66,7 @@ void dpr(instr_t instr)
       }
       switch (opc)
       {
-      case DPR_OPC_ADD: // add
+      case ARITH_OPC_ADD: // add
         if (sf)  // 64-bit
         {
           rd->x = rn->x + (int64_t)operand;
@@ -77,7 +77,7 @@ void dpr(instr_t instr)
           rd->w = rn->w + (int32_t)operand;
         }
         break;
-      case DPR_OPC_ADDS: // adds
+      case ARITH_OPC_ADDS: // adds
         if (sf)  // 64-bit
         {
           rd->ux = rn->ux + (uint64_t)operand;
@@ -96,7 +96,7 @@ void dpr(instr_t instr)
           pstate.v = ((rn->w < 0) && ((int32_t)operand < 0) && (rd->w > 0)) || ((rn->w > 0) && ((int32_t)operand > 0) && (rd->w < 0));
         }
         break;
-      case DPR_OPC_SUB: // sub
+      case ARITH_OPC_SUB: // sub
         if (sf)  // 64-bit
         {
           rd->ux = rn->ux - (uint64_t)operand;
@@ -107,7 +107,7 @@ void dpr(instr_t instr)
           rd->w = rn->w - (uint32_t)operand;
         }
         break;
-      case DPR_OPC_SUBS: // subs
+      case ARITH_OPC_SUBS: // subs
         if (sf)  // 64-bit
         {
           rd->ux = rn->ux - (uint64_t)operand;
