@@ -6,8 +6,9 @@
 #include "basics.h"
 
 // converts a load/store operation to binary
-instr_t ldstr(int *argv, int argc, seg_t load)
+instr_t ldstr(seg_t *argv, int argc, seg_t load)
 {
+    printf("ldstr: receiving %d arguments\n", argc); // debug
     assert(argc == 4 || argc == 5 || argc == 6);
     seg_t sf = argv[0] == ARG_T_REGX;
     seg_t rt = argv[1];
@@ -33,9 +34,9 @@ instr_t ldstr(int *argv, int argc, seg_t load)
     else if (argv[2] == ARG_T_AREG)
     {
         seg_t xn = argv[3];
-        if (argc == 4)
+        if (argc == 5)
         {
-            seg_t offset = SDT_OFFS_TMPL_IMM;
+            seg_t offset = SDT_OFFS_TMPL_IMM | argv[4];
             return sdt(sf, load, offset, xn, rt);
         }
         else
@@ -48,6 +49,7 @@ instr_t ldstr(int *argv, int argc, seg_t load)
     }
     else if (argv[2] == ARG_T_LIT)
     {
+        printf("ldstr: receiving literal %u\n", argv[3]);
         assert(load);
         seg_t addr = argv[3];
         return ll(sf, addr, rt);

@@ -2,6 +2,8 @@
 #ifndef ARG_H
 #define ARG_H
 
+#include "../common/datatypes.h"
+
 // flags for integer arguments
 typedef enum arg
 {
@@ -21,12 +23,12 @@ typedef enum arg
 } arg_t;
 
 // parse an integer regardless of base (10 or 16)
-void parseint(char **chrptr, int *buffer);
+void parseint(char **chrptr, seg_t *buffer);
 
 // parse the index of a register
-void parsereg(char **chrptr, int *buffer);
+void parsereg(char **chrptr, seg_t *buffer);
 
 // parse all arguments in a given string, returns the number of arguments
-extern int parseall(char *line, int *argv);
+extern int parseall(char *line, seg_t *argv);
 
 #endif

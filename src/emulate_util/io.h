@@ -3,7 +3,7 @@
 #define IO_H
 
 #define IO_SUCCESS (0)
-#define IO_FAILURE (1)
+#define IO_FAILURE (-1)
 
 // write to terminal, always returns success
 int tout(void);

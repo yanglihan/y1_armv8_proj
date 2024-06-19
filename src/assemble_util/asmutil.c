@@ -1,7 +1,5 @@
 #include "asmutil.h"
 
-#include <ctype.h>
-
 // trims a string from the left
 void ltrim(char **chrptr)
 {
@@ -58,9 +56,11 @@ int cpyunesc(char *src, char *dst)
 }
 
 // inserts n elements at pos in an array, assuming sufficient size, returns the new size
-size_t insnelem(int *dst, size_t len, size_t pos, int *src, size_t n)
+size_t insnelem(seg_t *dst, size_t len, size_t pos, seg_t *src, size_t n)
 {
-    memmove(dst + pos + n, dst + pos, (len - pos) * sizeof(int));
-    memcpy(dst + pos, src, n);
+    printf("insnelem: attempting to insert elements %llu, %llu\n", src[0], src[1]); // debug
+    memmove(dst + pos + n, dst + pos, (len - pos) * sizeof(seg_t));
+    memcpy(dst + pos, src, n * sizeof(seg_t));
+    printf("insnelem: resulting elements %llu, %llu\n", dst[pos], src[pos + 1]); // debug
     return len + n;
 }

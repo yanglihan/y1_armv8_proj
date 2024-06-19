@@ -5,6 +5,6 @@
 #include "../common/datatypes.h"
 
 // converts an arithmetic operation to binary
-extern instr_t arith(int *argv, int argc, seg_t opc);
+extern instr_t arith(seg_t *argv, int argc, seg_t opc);
 
 #endif

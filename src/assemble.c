@@ -1,42 +1,36 @@
 
-#include "assemble_util/operations.h"
-#include "assemble_util/asmconsts.h"
-#include "common/datatypes.h"
-#include "common/consts.h"
+#include "assemble_util/io.h"
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(int argc, char const *argv[])
 {
-  // if (argc != 3)
-  // {
-  //   printf("Invalid number of arguments!\nExpected: %s input_file [output_file]\n", argv[0]);
-  //   return EXIT_SUCCESS;
-  // }
+  char infile[100];
+  char outfile[100];
+  if (argc != 3)
+  {
+    printf("Please enter input and output below:\n");
+    scanf("%s", infile);
+    scanf("%s", outfile);
+    printf("Get terminal input success\n"); // debug
+  }
+  else
+  {
+    strcpy(infile, argv[1]);
+    strcpy(outfile, argv[2]);
+  }
 
-  // FILE *in = fopen(argv[1], "rb");
-  // FILE *out = fopen(argv[2], "w");
-  // if (in == NULL || out == NULL)
-  // {
-  //   if (in == NULL) printf("Invalid input file!\n");
-  //   if (out == NULL) printf("Invalid output file!\n");
-  //   fclose(in);
-  //   fclose(out);
-  //   return EXIT_SUCCESS;
-  // }
+  printf("got input and output %s => %s\n", infile, outfile); // debug
 
-  // char *lineBuffer[LINE_MAX_LENGTH];
-
-  // while (!feof(in)){
-  //   fread(lineBuffer, LINE_MAX_LENGTH, 1, in);
-  //   instr_t instruction = (lineBuffer);
-  //   if (instruction == 0) continue; // continue on empty lines
-  //   if (instruction == NULL) break; // directive not supported yet, exit upon "and x0, x0, x0"
-  //   fprintf(out, "%lu", instruction);
-  // }
-
-  // fclose(in);
-  // fclose(out);
-
-  // return EXIT_SUCCESS;
+  if (fpreasm(infile, outfile) >= 0)
+  {
+    fasm(infile, outfile);
+  }
+  else
+  {
+    return EXIT_FAILURE;
+  }
+  
+  return EXIT_SUCCESS;
 }

@@ -6,7 +6,6 @@
 #include "symbol.h"
 #include "operations.h"
 #include "../common/consts.h"
-#include "../common/datatypes.h"
 
 // reads the mnemonic of a condition
 seg_t mnecond(char *mne)
@@ -43,7 +42,7 @@ seg_t mnecond(char *mne)
 }
 
 // reads the mnemonic of an instruction
-instr_t mneread(char *mne, int *argv, int argc)
+instr_t mneread(char *mne, seg_t *argv, int argc)
 {
     if (!strcasecmp(mne, "add"))
     {
@@ -166,7 +165,7 @@ instr_t mneread(char *mne, int *argv, int argc)
     {
         argc = insnelem(argv, argc, 6, argv, 2); // first argument should always be regw or regx
         argv[7] = ZR_INDEX;
-        return multi(argv, argc, ARITH_NONEG);
+        return multi(argv, argc, ARITH_NEG);
     }
     else if (!strcasecmp(mne, "b"))
     {
@@ -176,7 +175,7 @@ instr_t mneread(char *mne, int *argv, int argc)
     {
         return branch(argv, argc, BR_COND_AL);
     }
-    else if (strncasecmp(mne, "b.", 2))
+    else if (!strncasecmp(mne, "b.", 2))
     {
         return branch(argv, argc, mnecond(mne + 2));
     }
@@ -184,18 +183,19 @@ instr_t mneread(char *mne, int *argv, int argc)
     {
         return ldstr(argv, argc, LDSTR_STR);
     }
-    else if (strcasecmp(mne, "ldr"))
+    else if (!strcasecmp(mne, "ldr"))
     {
         return ldstr(argv, argc, LDSTR_LD);
     }
+    return 0x0;
 }
 
 // converts a single line to binary, returns offset
-int asmline(char *line, instr_t *buffer, instr_t *begin)
+int asmline(char *line, instr_t *buffer)
 {
     char *ptr = line;
     char *mne;
-    int argv[40];
+    seg_t argv[40];
     int argc;
     ltrim(&ptr);
 
@@ -204,25 +204,21 @@ int asmline(char *line, instr_t *buffer, instr_t *begin)
         return 0;
     }
 
-    if (ptr + strlen(ptr) - 1 == ':') // label
+    if (*(ptr + strlen(ptr) - 1) == ':')
     {
-        assert(strchr(ptr, ' ' == NULL));
-        assert(strchr(ptr, '\t' == NULL));
-        assert(isalpha(*ptr));
-        symbadd(ptr, (buffer - begin) << 2);
         return 0;
     }
-
+    
     if (*ptr == '.')
     {
-        if (strncasecmp(ptr, ".int", 4))
+        if (!strncasecmp(ptr, ".int", 4))
         {
             ptr += 4;
             ltrim(&ptr);
             parseint(&ptr, buffer);
             return 1;
         }
-        if (strncasecmp(ptr, ".string", 7))
+        if (!strncasecmp(ptr, ".string", 7))
         {
             int offset;
             ptr += 7;
@@ -238,5 +234,58 @@ int asmline(char *line, instr_t *buffer, instr_t *begin)
     mne = strsep(&line, " \t");
     argc = parseall(line, argv);
 
-    return 0;
+    instr_t bin = mneread(mne, argv, argc);
+    *buffer = bin;
+    return bin ? 1 : 0;
+}
+
+// converts a single line of directive to binary and adds label to symbol table
+// treats instrucitions as blank, returns offset
+int preasmline(char *line, instr_t *buffer, int pos)
+{
+    char *ptr = line;
+    char *mne;
+    seg_t argv[40];
+    int argc;
+    ltrim(&ptr);
+
+    if (!*ptr) // empty line
+    {
+        return 0;
+    }
+
+    if (*(ptr + strlen(ptr) - 1) == ':') // label
+    {
+        printf("preasmline: label %s encountered\n", ptr); // debug
+        assert(strchr(ptr, ' ') == NULL);
+        assert(strchr(ptr, '\t') == NULL);
+        assert(isalpha(*ptr));
+        symbadd(ptr, pos << 2);
+        return 0;
+    }
+
+    if (*ptr == '.')
+    {
+        if (!strncasecmp(ptr, ".int", 4))
+        {
+            ptr += 4;
+            ltrim(&ptr);
+            parseint(&ptr, buffer);
+            return 1;
+        }
+        if (!strncasecmp(ptr, ".string", 7))
+        {
+            int offset;
+            ptr += 7;
+            ltrim(&ptr);
+            assert(*ptr == '"');
+            offset = cpyunesc(ptr + 1, (void *)buffer);
+            offset = (offset + 3) >> 2;
+            return offset;
+        }
+        return 0;
+    }
+    
+    // instructions are ignored
+    return 1;
 }

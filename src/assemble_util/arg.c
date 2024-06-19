@@ -1,25 +1,26 @@
 #include "arg.h"
 
-#include "asmutil.h"
 #include "asmconsts.h"
+#include "asmutil.h"
 #include "symbol.h"
 
 #define BASE_DEFAULT (0)
 
 // parse an integer regardless of base (10 or 16)
-void parseint(char **chrptr, int *buffer)
+void parseint(char **chrptr, seg_t *buffer)
 {
-    *buffer = strtol((*chrptr), (chrptr), BASE_DEFAULT);
+    printf("parseint: chrptr => %s\n", *chrptr); // debug
+    *buffer = strtoul((*chrptr), (chrptr), BASE_DEFAULT);
 }
 
 // parse the index of a register
-void parsereg(char **chrptr, int *buffer)
+void parsereg(char **chrptr, seg_t *buffer)
 {
-
-    if (strncasecmp(*chrptr, "zr", 2))
+    printf("parsereg: chrptr => %s\n", *chrptr); // debug
+    if (!strncasecmp(*chrptr, "zr", 2))
     {
         *buffer = ZR_INDEX;
-        chrptr += 2;
+        (*chrptr) += 2;
     }
     else
     {
@@ -28,38 +29,46 @@ void parsereg(char **chrptr, int *buffer)
 }
 
 // parse the next argument, and set the char pointer to, if possible, the beginning of next argument
-static arg_t parsearg(char **str, int *arg1, int *arg2)
+static arg_t parsearg(char **str, seg_t *arg1, seg_t *arg2)
 {
     arg_t retv, argtype;
     ltrim(str);
+    printf("parsearg: str => %s\n", *str); // debug
 
     if (!**str)
     {
         return ARG_T_NOARG;
     }
 
-    int intbuffer = 0;
-    switch (tolower(*(*str)++))
+    seg_t intbuffer = 0;
+    switch (tolower(**str))
     {
-    case 'w': // 32-bit register
+    case 'w':                                     // 32-bit register
+        (*str)++;
+        printf("parsearg: case w => %s\n", *str); // debug
         parsereg(str, &intbuffer);
         assert(intbuffer >= 0 && intbuffer < 32);
         *arg1 = intbuffer;
         retv = ARG_T_REGW;
         break;
-    case 'x': // 64-bit register
+    case 'x':                                     // 64-bit register
+        (*str)++;
+        printf("parsearg: case x => %s\n", *str); // debug
         parsereg(str, &intbuffer);
         assert(intbuffer >= 0 && intbuffer < 32);
         *arg1 = intbuffer;
         retv = ARG_T_REGX;
         break;
-    case '#': // immediate value
+    case '#':                                     // immediate value
+        (*str)++;
+        printf("parsearg: case # => %s\n", *str); // debug
         parseint(str, &intbuffer);
-        assert(intbuffer >= 0 && intbuffer < 32);
         *arg1 = intbuffer;
         retv = ARG_T_IMM;
         break;
-    case '[': // register address
+    case '[':                                     // register address
+        (*str)++;
+        printf("parsearg: case [ => %s\n", *str); // debug
         ltrim(str);
         argtype = parsearg(str, arg1, &intbuffer);
         if (argtype == ARG_T_REGX)
@@ -109,8 +118,10 @@ static arg_t parsearg(char **str, int *arg1, int *arg2)
             retv = ARG_T_AIMM;
         }
         break;
-    default: // consider rotations
-        if (strncmp(*str, "lsl", 3))
+    default:                                                      // consider shifts
+        printf("parsearg: consider shifts str => %s\n", *str);    // debug
+        printf("parsearg: lsl => %d\n", strncmp(*str, "lsl", 3)); // debug
+        if (!strncmp(*str, "lsl", 3))
         {
             (*str) += 3;
             ltrim(str);
@@ -119,17 +130,16 @@ static arg_t parsearg(char **str, int *arg1, int *arg2)
             parseint(str, arg1);
             retv = ARG_T_LSL;
         }
-        else if (strncmp(*str, "lsr", 3))
+        else if (!strncmp(*str, "lsr", 3))
         {
             (*str) += 3;
             ltrim(str);
             assert(**str == '#');
             (*str)++;
             parseint(str, arg1);
-            *arg1 = intbuffer;
             retv = ARG_T_LSR;
         }
-        else if (strncmp(*str, "asr", 3))
+        else if (!strncmp(*str, "asr", 3))
         {
             (*str) += 3;
             ltrim(str);
@@ -138,7 +148,7 @@ static arg_t parsearg(char **str, int *arg1, int *arg2)
             parseint(str, arg1);
             retv = ARG_T_ASR;
         }
-        else if (strncmp(*str, "ror", 3))
+        else if (!strncmp(*str, "ror", 3))
         {
             (*str) += 3;
             ltrim(str);
@@ -156,6 +166,7 @@ static arg_t parsearg(char **str, int *arg1, int *arg2)
                 (*str)++;
             }
             *arg1 = symbget(begin, *str - begin);
+            printf("parsearg: successfully found literal %s at %u\n", begin, *arg1); // debug
             ltrim(str);
         }
         break;
@@ -170,10 +181,10 @@ static arg_t parsearg(char **str, int *arg1, int *arg2)
 }
 
 // parse all arguments in a given string, returns the number of arguments
-int parseall(char *line, int *argv)
+int parseall(char *line, seg_t *argv)
 {
     char *chrptr = line;
-    int buffer1, buffer2;
+    seg_t buffer1, buffer2;
     int argc = 0;
     arg_t argtype;
 

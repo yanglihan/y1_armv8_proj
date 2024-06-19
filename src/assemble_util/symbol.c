@@ -18,6 +18,7 @@ int nsymb = 0;  // the number of symbols
 // add a label-address pair into the table, auto-remove the colon
 int symbadd(char *label, addr_t addr)
 {
+    printf("symbadd: attempting to add %s symbol into table of size %d\n", label, nsymb); // debug
     char *colon;
     assert(!existlabel(label));
     symbtbl = realloc(symbtbl, sizeof(symb_t) * (nsymb + 1));
@@ -29,6 +30,7 @@ int symbadd(char *label, addr_t addr)
         *colon = '\0';
     }
     nsymb++;
+    return 0;
 }
 
 // check if a label already exists
@@ -47,10 +49,11 @@ int8_t existlabel(char *label)
 // get the address of a label
 addr_t symbget(char *label, int len)
 {
+    printf("symbget: attempting to get %s symbol of len %d in table of size %d\n", label, len, nsymb); // debug
     FORALLSYMB_I
     {
-        
-        if (strncmp(symbtbl[i].label, label, len))
+        printf("symbget: comparing against label %s\n", symbtbl[i].label); // debug
+        if (!strncmp(symbtbl[i].label, label, len))
         {
             return symbtbl[i].addr;
         }

@@ -6,7 +6,7 @@
 #include "basics.h"
 
 // converts a bit-wise logical operation to binary
-instr_t logic(int *argv, int argc, seg_t opc, seg_t n)
+instr_t logic(seg_t *argv, int argc, seg_t opc, seg_t n)
 {
   assert(argc == 6 || argc == 8);
   seg_t sf = argv[0] == ARG_T_REGX;
@@ -19,6 +19,7 @@ instr_t logic(int *argv, int argc, seg_t opc, seg_t n)
   seg_t operand = DEFAULT_NO_ARG;
   if (argc == 8)
   {
+    printf("logic: shift (%u, %u)\n", argv[6], argv[7]);
     switch (argv[6])
     {
     case ARG_T_LSL:

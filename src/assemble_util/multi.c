@@ -6,9 +6,11 @@
 #include "basics.h"
 
 // converts a multiplication operation to binary
-instr_t multi(int *argv, int argc, seg_t neg)
+instr_t multi(seg_t *argv, int argc, seg_t neg)
 {
   assert(argc == 8);
+  printf("multi: (%llu, %llu, %llu, %llu, %llu, %llu, %llu, %llu)\n",
+      argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7]);    // debug
   seg_t sf = argv[0];
   seg_t rd = argv[1];
   assert(argv[2] == argv[0]);

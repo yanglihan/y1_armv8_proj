@@ -6,7 +6,7 @@
 #include "../common/consts.h"
 
 // converts a branch operation to binary
-instr_t branch(int *argv, int argc, seg_t cond)
+instr_t branch(seg_t *argv, int argc, seg_t cond)
 {
     assert(argc == 2);
 

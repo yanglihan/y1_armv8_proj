@@ -5,6 +5,6 @@
 #include "../common/datatypes.h"
 
 // converts a bit-wise logical operation to binary
-extern instr_t logic(int *argv, int argc, seg_t opc, seg_t n);
+extern instr_t logic(seg_t *argv, int argc, seg_t opc, seg_t n);
 
 #endif
