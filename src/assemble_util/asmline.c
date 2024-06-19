@@ -199,7 +199,7 @@ int asmline(char *line, instr_t *buffer)
     int argc;
     ltrim(&ptr);
 
-    if (!*ptr) // empty line
+    if (*ptr == '\0') // empty line
     {
         return 0;
     }

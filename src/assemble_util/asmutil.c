@@ -3,8 +3,7 @@
 // trims a string from the left
 void ltrim(char **chrptr)
 {
-    for (; **chrptr && isspace(**chrptr); (*chrptr)++)
-        ;
+    for (; **chrptr && isspace(**chrptr); (*chrptr)++);
 }
 
 // copy a string from src to dst while unescaping src

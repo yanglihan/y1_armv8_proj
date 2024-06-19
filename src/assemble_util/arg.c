@@ -166,7 +166,7 @@ static arg_t parsearg(char **str, seg_t *arg1, seg_t *arg2)
                 (*str)++;
             }
             *arg1 = symbget(begin, *str - begin);
-            printf("parsearg: successfully found literal %s at %u\n", begin, *arg1); // debug
+            printf("parsearg: successfully found literal %s at %lu\n", begin, *arg1); // debug
             ltrim(str);
         }
         break;

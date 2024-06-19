@@ -23,7 +23,7 @@ Macros beginning with C_ are predicates.
 
 #define BR_TMPL_UNC     (0x14000000)
 #define BR_TMPL_REG     (0xd61f0000)
-#define BR_TMPL_CON     (0xa4000000)
+#define BR_TMPL_CON     (0x54000000)
 
 #define DPI_OPI_AR      (0b010)
 #define DPI_OPI_WM      (0b101)
