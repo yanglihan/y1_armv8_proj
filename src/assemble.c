@@ -13,15 +13,12 @@ int main(int argc, char const *argv[])
     printf("Please enter input and output below:\n");
     scanf("%s", infile);
     scanf("%s", outfile);
-    printf("Get terminal input success\n"); // debug
   }
   else
   {
     strcpy(infile, argv[1]);
     strcpy(outfile, argv[2]);
   }
-
-  printf("got input and output %s => %s\n", infile, outfile); // debug
 
   if (fpreasm(infile, outfile) >= 0)
   {

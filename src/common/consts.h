@@ -56,6 +56,9 @@ Macros beginning with C_ are predicates.
 #define SDT_OFFS_TMPL_POS    (0x001)
 #define SDT_OFFS_TMPL_IMM    (0x000)
 
+#define SDT_U_SIGNED    (0b0)
+#define SDT_U_UNSIGNED  (0b1)
+
 #define SHIFT_LSL       (0b00)
 #define SHIFT_LSR       (0b01)
 #define SHIFT_ASR       (0b10)

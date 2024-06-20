@@ -1,14 +1,15 @@
 main:
-    ldr     w5, ledioset
+    ldr     w5, lediosetall
     ldr     w6, iosaddr
     str     w5, [x6]
 
+    movz    w3, #0
+
+    b       seton
+
 loop:
-    ldr     w6, swiaddr
-    ldr     w2, [x6]
-    orr     w9, w9, w2
     add     w0, w0, #1
-    ldr     w1, ncycl
+    ldr     w1, ncyclmin
     cmp     w0, w1
     b.ge    switch
     b       loop
@@ -19,68 +20,42 @@ switch:
     b       seton
 
 seton:
-    ldr     w5, ledctrl
+    ldr     w5, ledcol1ctrl
     ldr     w6, setaddr
-    str     w3, [x6]
+    str     w5, [x6]
+    ldr     w6, clraddr
+    str     wzr, [x6]
     b       finally
 
 setoff:
-    ldr     w5, ledctrl
+    ldr     w5, ledcol1ctrl
     ldr     w6, clraddr
     str     w5, [x6]
+    ldr     w6, setaddr
+    str     wzr, [x6]
     b       finally
 
 finally:
     movz    w0, #0
-    ldr     w5, freqmask
-    tst     w9, w5
-    add     x23, pc, #4
-    b.ne    chncycl
-    ldr     w5, colmask
-    tst     w9, w5
-    add     x23, pc, #4
-    b.ne    chncol
     b       loop
 
-chncycl:
-    ldr     w1, ncycl
-    orr     w1, wzr, w1, lsl #2
-    ldr     w5, ncyclmax
-    cmp     w1, w5
-    b.le    savcycl
-    ldr     w1, ncyclmin
-
-savcycl:
-    str     w1, ncycl
-    movz    w9, #0
-    mov     pc, x23
-
-chncol:
-    ldr     w1, ledctrl
-    ldr     w5, ledcol1ctrl
-    cmp     w1, w5
-    b.eq    chncol2
-    str     w5, ledctrl
-    mov     pc, x23
-
-chncol2:
-    ldr     w5, ledcol2ctrl
-    str     w5, ledctrl
-    mov     pc, x23
 
 exit:
     
-ncycl:
-    .int    0x00010000
+ncyclptr:
+    .int    0x0000d000
 
 ncyclmax:
-    .int    0x00010000
+    .int    0x10000000
 
 ncyclmin:
-    .int    0x00001000
+    .int    0x00100000
 
 iosaddr:
     .int    0x3f200000
+
+lediosetall:
+    .int    0x09249249
 
 ledioset:
     .int    0x00000240
@@ -91,11 +66,11 @@ setaddr:
 clraddr:
     .int    0x3f200028
 
-ledctrl:
-    .int    0x00000008
+ledctrlptr:
+    .int    0x0000d008
 
 ledcol1ctrl:
-    .int    0x00000008
+    .int    0xffffffff
 
 ledcol2ctrl:
     .int    0x00000004

@@ -169,15 +169,15 @@ instr_t mneread(char *mne, seg_t *argv, int argc)
     }
     else if (!strcasecmp(mne, "b"))
     {
-        return branch(argv, argc, BR_COND_AL);
+        return branch(argv, argc, BR_UNCOND, DEFAULT_NO_ARG);
     }
     else if (!strcasecmp(mne, "br"))
     {
-        return branch(argv, argc, BR_COND_AL);
+        return branch(argv, argc, BR_UNCOND, DEFAULT_NO_ARG);
     }
     else if (!strncasecmp(mne, "b.", 2))
     {
-        return branch(argv, argc, mnecond(mne + 2));
+        return branch(argv, argc, BR_COND, mnecond(mne + 2));
     }
     else if (!strcasecmp(mne, "str"))
     {
@@ -191,31 +191,34 @@ instr_t mneread(char *mne, seg_t *argv, int argc)
 }
 
 // converts a single line to binary, returns offset
-int asmline(char *line, instr_t *buffer)
+int asmline(char *line, instr_t *buffer, int pos)
 {
     char *ptr = line;
     char *mne;
     seg_t argv[40];
     int argc;
     ltrim(&ptr);
+    rtrim(ptr, strlen(ptr));
 
     if (*ptr == '\0') // empty line
     {
         return 0;
     }
 
-    if (*(ptr + strlen(ptr) - 1) == ':')
+    if (*(ptr + strlen(ptr) - 1) == ':') // label
     {
         return 0;
     }
     
-    if (*ptr == '.')
+    if (*ptr == '.') // directive
     {
         if (!strncasecmp(ptr, ".int", 4))
         {
+            seg_t longbuffer;
             ptr += 4;
             ltrim(&ptr);
-            parseint(&ptr, buffer);
+            parseint(&ptr, &longbuffer);
+            *buffer = (instr_t)longbuffer;
             return 1;
         }
         if (!strncasecmp(ptr, ".string", 7))
@@ -231,8 +234,8 @@ int asmline(char *line, instr_t *buffer)
         return 0;
     }
 
-    mne = strsep(&line, " \t");
-    argc = parseall(line, argv);
+    mne = strsep(&ptr, " \t");
+    argc = parseall(ptr, argv, pos);
 
     instr_t bin = mneread(mne, argv, argc);
     *buffer = bin;
@@ -248,6 +251,7 @@ int preasmline(char *line, instr_t *buffer, int pos)
     seg_t argv[40];
     int argc;
     ltrim(&ptr);
+    rtrim(ptr, strlen(ptr));
 
     if (!*ptr) // empty line
     {
@@ -256,21 +260,22 @@ int preasmline(char *line, instr_t *buffer, int pos)
 
     if (*(ptr + strlen(ptr) - 1) == ':') // label
     {
-        printf("preasmline: label %s encountered\n", ptr); // debug
         assert(strchr(ptr, ' ') == NULL);
         assert(strchr(ptr, '\t') == NULL);
-        assert(isalpha(*ptr));
-        symbadd(ptr, pos << 2);
+        assert(!isnumber(*ptr));
+        symbadd(ptr, pos);
         return 0;
     }
 
-    if (*ptr == '.')
+    if (*ptr == '.') // directive
     {
         if (!strncasecmp(ptr, ".int", 4))
         {
+            seg_t longbuffer;
             ptr += 4;
             ltrim(&ptr);
-            parseint(&ptr, buffer);
+            parseint(&ptr, &longbuffer);
+            *buffer = (instr_t)longbuffer;
             return 1;
         }
         if (!strncasecmp(ptr, ".string", 7))

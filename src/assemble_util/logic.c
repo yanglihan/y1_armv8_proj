@@ -1,9 +1,9 @@
 #include "logic.h"
 
-#include "../common/consts.h"
 #include "arg.h"
 #include "asmutil.h"
 #include "basics.h"
+#include "../common/consts.h"
 
 // converts a bit-wise logical operation to binary
 instr_t logic(seg_t *argv, int argc, seg_t opc, seg_t n)
@@ -17,9 +17,8 @@ instr_t logic(seg_t *argv, int argc, seg_t opc, seg_t n)
   seg_t rm = argv[5];
   seg_t shift = DEFAULT_NO_ARG;
   seg_t operand = DEFAULT_NO_ARG;
-  if (argc == 8)
+  if (argc == 8) // with shift
   {
-    printf("logic: shift (%u, %u)\n", argv[6], argv[7]);
     switch (argv[6])
     {
     case ARG_T_LSL:

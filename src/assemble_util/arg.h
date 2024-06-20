@@ -23,12 +23,15 @@ typedef enum arg
 } arg_t;
 
 // parse an integer regardless of base (10 or 16)
-void parseint(char **chrptr, seg_t *buffer);
+extern void parseint(char **chrptr, seg_t *buffer);
 
 // parse the index of a register
 void parsereg(char **chrptr, seg_t *buffer);
 
+// parse the next argument, and set the char pointer to, if possible, the beginning of next argument
+extern arg_t parsearg(char **str, seg_t *arg1, seg_t *arg2, int pos);
+
 // parse all arguments in a given string, returns the number of arguments
-extern int parseall(char *line, seg_t *argv);
+extern int parseall(char *line, seg_t *argv, int pos);
 
 #endif

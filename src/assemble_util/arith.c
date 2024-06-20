@@ -1,25 +1,15 @@
 #include "arith.h"
 
-#include "../common/consts.h"
 #include "arg.h"
 #include "asmutil.h"
 #include "basics.h"
+#include "../common/consts.h"
 
 // converts an arithmetic operation to binary
 instr_t arith(seg_t *argv, int argc, seg_t opc)
 {
   assert(argc == 6 || argc == 8);
-  if (argc == 6)
-  {
-    printf("arith: (%llu, %llu, %llu, %llu, %llu, %llu)\n",
-     argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);    // debug
-  }
-  else
-  {
-    printf("arith: (%llu, %llu, %llu, %llu, %llu, %llu, %llu, %llu)\n",
-      argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7]);    // debug
-  }
-  
+
   seg_t sf = argv[0] == ARG_T_REGX;
   seg_t rd = argv[1];
   if (argv[4] == ARG_T_IMM) // dpi
@@ -29,7 +19,7 @@ instr_t arith(seg_t *argv, int argc, seg_t opc)
     seg_t sh = DPI_SH_NOSHIFT;
     assert(argv[2] == argv[0]);
     seg_t rn = argv[3];
-    if (argc == 8) // lsl #12
+    if (argc == 8) // with shift
     {
       assert(argv[6] == ARG_T_LSL);
       sh = DPI_SH_SHIFT * (argv[7] == 12);
@@ -45,7 +35,7 @@ instr_t arith(seg_t *argv, int argc, seg_t opc)
     seg_t rm = argv[5];
     seg_t opr = DPR_OPR_ARITH;
     seg_t operand = 0;
-    if (argc == 8)
+    if (argc == 8) // with shift
     {
       int shift = SHIFT_LSL;
       switch (argv[6])

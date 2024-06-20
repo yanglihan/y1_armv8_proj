@@ -5,6 +5,6 @@
 #include "../common/datatypes.h"
 
 // converts a branch operation to binary
-extern instr_t branch(seg_t *argv, int argc, seg_t cond);
+extern instr_t branch(seg_t *argv, int argc, seg_t iscond, seg_t cond);
 
 #endif
