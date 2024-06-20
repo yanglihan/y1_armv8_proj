@@ -10,7 +10,7 @@
 // #define DEBUG                    // for general debugging
 
 #ifdef LINE_BY_LINE_PRINT_DEBUG
-#define debug_print_state() print_state()
+#define debug_print_state() tout()
 #else
 #define debug_print_state()
 #endif

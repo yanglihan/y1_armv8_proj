@@ -1,63 +1,100 @@
 main:
-    ldr     w5, lediosetall
     ldr     w6, iosaddr
+    ldr     w5, iosval
     str     w5, [x6]
+    ldr     w6, swiiosaddr
+    ldr     w5, swiiosval
+    str     w5, [x6]
+    str     wzr, [x6, #4]
+    ldr     w5, ncycl
+    mov     w20, w5
+    ldr     w5, ctrlvalgreen
+    mov     w16, w5
 
-    movz    w3, #0
+startloop1:
+    movz    w1, #0
+    movz    w17, #0
+    ldr     w6, swiaddr
+    sub     w2, wzr, #1
+    str     w2, [x6]
 
-    b       seton
+loop1:
+    cmp     w1, w20
+    b.ge    startloop2
+    add     w1, w1, #1
+    ldr     w6, swiaddr
+    ldr     w5, [x6]
+    orr     w17, w17, w5
 
-loop:
-    add     w0, w0, #1
-    ldr     w1, ncyclmin
-    cmp     w0, w1
-    b.ge    switch
-    b       loop
-
-switch:
-    neg     w3, w3
-    b.eq    setoff
-    b       seton
-
-seton:
-    ldr     w5, ledcol1ctrl
+ledset:
+    mov     w5, w16
     ldr     w6, setaddr
     str     w5, [x6]
-    ldr     w6, clraddr
-    str     wzr, [x6]
-    b       finally
+    b       loop1
 
-setoff:
-    ldr     w5, ledcol1ctrl
+startloop2:
+    movz    w1, #0
+
+loop2:
+    cmp     w1, w20
+    b.ge    finally
+    add     w1, w1, #1
+
+ledclr:
+    mov     w5, w16
     ldr     w6, clraddr
     str     w5, [x6]
-    ldr     w6, setaddr
-    str     wzr, [x6]
-    b       finally
+    b       loop2
 
 finally:
-    movz    w0, #0
-    b       loop
+
+testcolour:
+    ldr     w5, colmask
+    tst     w17, w5
+    b.eq    testfreq
+    ldr     w5, ctrlvalgreen
+    cmp     w5, w16
+    b.eq    changered
+    b       changegreen
+
+changegreen:
+    ldr     w5, ctrlvalgreen
+    mov     w16, w5
+    b       testfreq
+
+changered:
+    ldr     w5, ctrlvalred
+    mov     w16, w5
+    b       testfreq
+
+testfreq:
+    ldr     w5, freqmask
+    tst     w17, w5
+    b.eq    startloop1
+    ldr     w5, ncyclmin
+    cmp     w20, w5
+    b.le    resetfreq
+    orr     w20, wzr, w20, lsr #2
+    b       startloop1
+
+resetfreq:
+    ldr     w5, ncycl
+    mov     w20, w5
+    b       startloop1
 
 
 exit:
     
-ncyclptr:
-    .int    0x0000d000
-
-ncyclmax:
-    .int    0x10000000
+ncycl:
+    .int    0x00400000
 
 ncyclmin:
-    .int    0x00100000
+    .int    0x00004000
 
 iosaddr:
     .int    0x3f200000
 
-lediosetall:
-    .int    0x09249249
-
-ledioset:
+iosval:
     .int    0x00000240
 
 setaddr:
@@ -66,20 +103,23 @@ setaddr:
 clraddr:
     .int    0x3f200028
 
-ledctrlptr:
-    .int    0x0000d008
+ctrlvalgreen:
+    .int    0x00000008
 
-ledcol1ctrl:
-    .int    0xffffffff
-
-ledcol2ctrl:
+ctrlvalred:
     .int    0x00000004
 
+swiiosaddr:
+    .int    0x3f200064
+
+swiiosval:
+    .int    0x00102000
+
 swiaddr:
-    .int    0x3f200034
+    .int    0x3f200040
 
 freqmask:
-    .int    0x00310000
+    .int    0x00100000
 
 colmask:
-    .int    0x0004c000
+    .int    0x00002000
