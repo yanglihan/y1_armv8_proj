@@ -41,7 +41,7 @@ arg_t parsearg(char **str, seg_t *arg1, seg_t *arg2, int pos)
     switch (tolower(**str))
     {
     case 'w': // 32-bit register
-        if (((strncasecmp(*str, "wzr", 3) && !sscanf(*str, "w%lld", &intbuffer))) || !(isspace(*(*str + 3)) || (*(*str + 3) == ',' || !*(*str + 3))))
+        if ((strncasecmp(*str, "wzr", 3) || !(isspace(*(*str + 3)) || (*(*str + 3) == ',' || !*(*str + 3)))) && !sscanf(*str, "w%lld", &intbuffer))
         // not register format
         {
             retv = ARG_T_LIT;
@@ -54,7 +54,7 @@ arg_t parsearg(char **str, seg_t *arg1, seg_t *arg2, int pos)
         retv = ARG_T_REGW;
         break;
     case 'x': // 64-bit register
-        if (((strncasecmp(*str, "xzr", 3) &&!sscanf(*str, "x%lld", &intbuffer)) || !(isspace(*(*str + 3)) || (*(*str + 3) == ',' || !*(*str + 3)))))
+        if ((strncasecmp(*str, "xzr", 3) || !(isspace(*(*str + 3)) || (*(*str + 3) == ',' || !*(*str + 3)))) && !sscanf(*str, "x%lld", &intbuffer))
         // not register format
         {
             retv = ARG_T_LIT;
