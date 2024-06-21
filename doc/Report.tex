@@ -1,22 +1,192 @@
 \documentclass[11pt]{article}
 
 \usepackage{fullpage}
+\usepackage{svg}
+\usepackage{booktabs}
 
 \begin{document}
 
 \title{ARMv8 Final Report}
-\author{Group 29}
+\author{Group 29: YANG Lihan, Henry CHEN, Andy WANG, YE Zihao}
 
 \maketitle
 
 \section{Part II: Assembler Structure}
 
-As with our Emulator, the Assembler consists of the \texttt{main} in \texttt{assemble.c} and functions serving various purposes defined in \texttt{assemble_util/}.
+As with our Emulator, the Assembler consists of the \texttt{main} in \texttt{assemble.c} and functions serving various purposes defined in \texttt{assemble\_util/}. Data types (namely \texttt{instr\_t}, \texttt{seg\_t} and \texttt{addr\_t}) and constants used in both the Emulator and the Assembler are defined in header files in \texttt{common/}.
 
-\section{Part III: LED program}
+\subsection{Basic Instructions}
 
-To be added\dots
+In \texttt{assemble\_util/basics.[ch]}, we defined the functions \texttt{dpi}, \texttt{dpr}, \texttt{sdt}, \texttt{ll} and \texttt{br} which generate the respective binary instruction from fixed parameters. These functions shift the arguments to their respective positions and return the 32-bit binary.
 
+All higher-order assembly functions call these functions to generate the required binary instruction.
 
+\subsection{Symbol Table}
+
+The functions defined in \texttt{assemble\_util/symbol.[ch]} access and manage the symbol table. These functions include \texttt{symbload} which loads the symbol table prior to assembling instructions, \texttt{symbget} which returns the memory address of a label, and \texttt{freesymbtbl} which frees the symbol table when the assemblation is complete.
+
+The actual symbol table is stored in a dynamic array of \texttt{symb\_t}, each containing a string \texttt{label} up to 20 characters and its address \texttt{addr}.
+
+\subsection{assembly functions}
+
+The assembly functions include \texttt{arith}, \texttt{ldstr}, \texttt{logic}, \texttt{move} and \texttt{multi}. These functions take a variable-length array as input (discussed in 1.6) with operation-specific parameters such as \texttt{opi} or \texttt{cond}. They convert the arguments into bit-fields and call the basic functions to get the binary instruction.
+
+\subsection{Pre-Assembly}
+
+Before the assembly begins, the program first scans through the source file without attempting to assemble any particular instruction. In the process, the pre-assembler \texttt{preasmline} defined in \texttt{assemble\_util/asmline.[ch]} leaves space for each instruction and derivative (in particular, it counts the exact number of words for string literals), and then save the labels and their respective positions in the symbol table.
+
+\subsection{Line-by-Line Assembly}
+
+The \texttt{asmline} function defined in \texttt{assemble\_util/asmline.[ch]} assembles a single line of instruction. It first determines whether the line is a label. Since labels are already loaded into the symbol table, labels are simply ignored by the line assembler. Then, it identifies derivatives which start with ``\texttt{.}'', such as \texttt{.int} and \texttt{.string}. These derivatives are handled directly by converting the data to binary. Finally, the mnemonic is compared against all implemented commands to find the corresponding assembly function, with the remaining arguments passed as arguments.
+
+Before the arguments are passed to assembly functions, we first use the function \texttt{parsearg} defined in \texttt{assemble\_util/arg.[ch]} to convert each input (e.g. \texttt{wzr}, \texttt{\#13}, and \texttt{[x4, \#4]}) to an \texttt{arg\_t} (an integer enumeration of argument types) followed by one or more integers (e.g. \texttt{[ARG\_T\_REGW, 31]}, \texttt{[ARG\_T\_IMM, 13]} and \texttt{[ARG\_T\_AREG, 4, 4]}). Table \ref{tab:arg_flag} shows the full list of arguments.
+
+\begin{table}[ht]
+    \centering
+    \scalebox{0.7}{\begin{tabular}{c|c|c}
+    Flag & Literal & Parameters \\\hline
+    \texttt{ARG\_T\_REGW} & \texttt{Wn} & \texttt{n} \\
+    \texttt{ARG\_T\_REGX} & \texttt{Xn} & \texttt{n} \\
+    \texttt{ARG\_T\_IMM} & \texttt{\#imm} & \texttt{imm} \\
+    \texttt{ARG\_T\_AIMM} & \texttt{[\#imm]} & \texttt{imm} \\
+    \texttt{ARG\_T\_AREG} & \texttt{[Xn(, \#imm)]} & \texttt{n}, \texttt{imm} \\
+    \texttt{ARG\_T\_ARR} & \texttt{[Xn, Xm]} & \texttt{n}, \texttt{m} \\
+     \texttt{ARG\_T\_APRE} & \texttt{[Xn(, \#imm)]!} & \texttt{n}, \texttt{imm} \\
+    \texttt{ARG\_T\_LSL} & \texttt{lsl \#imm} & \texttt{imm} \\
+    \texttt{ARG\_T\_LSR} & \texttt{lsr \#imm} & \texttt{imm} \\
+    \texttt{ARG\_T\_ASR} & \texttt{asr \#imm} & \texttt{imm} \\
+    \texttt{ARG\_T\_ROR} & \texttt{ror \#imm} & \texttt{imm} \\
+    \texttt{ARG\_T\_LIT} & \texttt{<literal>} & relative offset \\
+\end{tabular}}
+    \caption{Argument flags and parameters}
+    \label{tab:arg_flag}
+\end{table}
+
+The parsed arguments are passed as a single-dimension dynamic array to the assembly functions discussed in 1.3.
+
+\section{Part III: LED}
+
+Our LED project is carried out in two phases. First, we used two interconnected loops to achieve the basic requirement, and then extended the project by adding two input switches controlling frequency and colour. We used GPIOs 3 (green) and 2 (red) for power output, and GPIOs 26 and 13 for input, capturing frequency and colour switch instructions (see Figs \ref{fig:LED_Circuit} and \ref{fig:gpio}).
+
+\begin{figure}[ht]
+    \centering
+    \scalebox{0.7}{\includesvg[scale=0.27]{Circuit.svg}}
+    \caption{LED circuit diagram}
+    \label{fig:LED_Circuit}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \scalebox{0.6}{\includesvg[scale=0.18]{GPIO.svg}}
+    \caption{GPIO pin functions}
+    \label{fig:gpio}
+\end{figure}
+
+\subsection{Addresses and Constants}
+
+Table \ref{tab:led_constants} shows the constants defined for the first phase of our LED project. To implement the switches and frequency change, further constants are used to locate controllers for switches.
+
+\begin{table}[ht]
+    \centering
+    \scalebox{0.7}{\begin{tabular}{c|c|c}
+    Label & Description & Value \\\hline
+    \texttt{ncycl} & number of cycles per loop & \texttt{0x00400000} \\
+    \texttt{iosaddr} & address for \texttt{GPFSEL0} & \texttt{0x3f200000} \\
+    \texttt{iosval} & value for \texttt{GPFSEL0} & \texttt{0x00000240} \\
+     \texttt{setaddr} & address for \texttt{GPSET0} & \texttt{0x3f20001c} \\
+     \texttt{clraddr} & address for \texttt{GPCLR0} & \texttt{0x3f200028} \\
+    \texttt{ctrlvalgreen} & bits controlling the green LED & \texttt{0x00000008} \\
+    \texttt{ctrlvalred} & bits controlling the red LED & \texttt{0x00000004} \\
+\end{tabular}}
+    \caption{Constants defined in \texttt{led\_blink.s} (partial)}
+    \label{tab:led_constants}
+\end{table}
+
+\subsection{Register}
+
+We use registers to store all variables used in the program. Each register has an allocated use throughout the program (see Table \ref{tab:reg_alloc}).
+
+\begin{table}[ht]
+    \centering
+    \scalebox{0.7}{\begin{tabular}{c|c c c c c c c c c c}
+    \toprule
+        Reg & r1 & r2 & r5 & r6 & r16 & r17 & r20 \\\hline
+        Usage & loop var & temp var & ld/str val & addr & ctrl var & input & cycle len \\\bottomrule
+    \end{tabular}}
+    \caption{Register allocation}
+    \label{tab:reg_alloc}
+\end{table}
+
+\subsection{Procedure}
+
+The program runs in the following cycle: \texttt{main} -- \texttt{startloop1} -- \texttt{loop1} -- \texttt{ledset} -- \texttt{startloop2} -- \texttt{ledclr} -- \texttt{testcolour} -- [\texttt{changegreen}/\texttt{changered}] -- \texttt{testfreq} -- [\texttt{resetfreq}] -- \texttt{startloop1} -- \dots It will switch on and off once each in a cycle, and updates the colour and frequency at the end of an entire cycle.
+
+\section{Challenges}
+
+\subsection{Assembler}
+
+\subsubsection{Literal offset}
+
+The problem of calculating offset emerged when we were implementing \texttt{ldstr} and \texttt{br} with literals. This required getting the value of \texttt{PC} or, in the view of our Assembler, the current memory location. The theory was, when storing a 64-bit signed integer into smaller bit-fields such as \texttt{simm19}, there were no particular actions needed as the value can be shortened by simply removing the leading bits.
+
+However, as the arguments are passed around in 64-bit integers, fitting the argument into these bit-fields caused the higher bits in the instruction to change. As we did not foresee the need of explicit integer truncation, we had some problem location the cause of these failures. Eventually, we successfully implemented the truncation (\texttt{trun64}) by using bit-wise shifts with signed-unsigned type casts, the exact reverse of our \texttt{sgnext64} macro in the emulator.
+
+\subsubsection{Un-escaping characters in \texttt{.string} (extension)}
+
+As our mini-extension, we implemented the \texttt{.string} derivative in our Assembler. One issue was the use of escape characters. As strings in C are represented as an array of \texttt{char}, replacing escaped characters such as \texttt{\textbackslash\textbackslash} or \texttt{\textbackslash"} with a single character requires constant moving of the remaining string. This was inefficient and interferes with counting the total number of word-lengths occupied by the string. To solve this, we wrote another function \texttt{cpyunesc} which writes the un-escaped string to a buffer, and returns the length.
+
+\subsection{LED}
+
+\subsubsection{Hardware reliability}
+
+We used two LEDs, one resister, two switches and several cables in our circuit. Sometimes the LEDs could not be turned on due to loose connection, and it took time to figure out whether the problem was with the hardware or the software.
+
+For our extension, the problem became greater as the button switches are not entirely fit to the breadboard. Moreover, as the GPIO pins are highly sensitive to inputs, the switch circuit often cause the program to behave unexpectedly. However, when the program was determined to be correct, we could locate and, though not always, solve the connection problem in the circuit.
+
+\subsubsection{Debugging efficiency}
+
+Debugging took some effort, as the assembled program could not be directly uploaded to the Raspberry Pi and the emulator could not test reading and writing at the peripherals.
+
+\subsubsection{Lack of documentation (extension)}
+
+We were not able to find sufficient documentation regarding reading GPIO inputs directly from registers. The only documentation we found indicated two ways to read the input. One was reading the \texttt{GPLEV} register. However, though this method seemed intuitive, our program gets positive input in every loop, of which we could not locate the cause. Therefore, we tried the other method, by setting the respective \texttt{GPHEN} (High Detect Enable Registers) so that the pins listen for high voltage input, and then getting input from \texttt{GPEDS} (Even Detect Status Registers). In this way, we successfully enabled input from our switches.
+
+\subsection{Group Reflection}
+
+As detailed in our Checkpoint Report, our group was split into two subgroups working on the Emulator (Yang Lihan and Henry Chen) and the Assembler (Andy Wang and Ye Zihao) respectively. Due to a later deadline for the Assembler, members in our group preferring more time to familiarise with coding with C in a project could start their task at a slightly postponed time. Eventually, by the the Emulator was complete, the Emulator team focused on debugging the Assembler and working on the LED project. Specifically, Lihan has implemented major changes in response to failed test cases and optimised our code's structure, while being primarily responsible for the LED project; Henry has worked on debugging test cases as well and was responsible for the video presentation; Andy developed the higher order functions and part of the assembly functions; Zihao developed part of the assembly functions and contributed with technical support in the video presentation.
+
+\subsubsection{Strengths}
+
+All our group members take great ownership in the project. We discussed almost all aspects of the project, especially regarding code styles and implementation specifics, so that we not just produce a workable solution, but the most elegant solution achievable. This is exemplified by the our single-dimension dynamic array passing both argument types and values. We also use this project to explore extra features than those required by the specification, in both our Assembler and the LED project.
+
+Meanwhile, we also take pride in efficient communication. All group members could easily reach each other through chats and phone calls, and task requirements are delivered clearly. This allowed us to better keep track of the entire project.
+
+As mentioned above, our group was split according to level of experience. We feel that this was beneficial to our work as our subgroups could learn from each other's code as much as possible. It proved useful in maintaining consistent code styles and transferring important understanding of the architecture between the two parts in our project.
+
+\subsubsection{Areas for Improvement}
+
+In our project, our group face particular challenges during the handing over of distributed tasks. For example, in both our Emulator and our Assembler, we experienced significant time lags between writing codes, checking codes and debugging failed test cases. Due to these gaps, we could not leverage on our strength as a group to work together concurrently. This partly resulted in several of our milestones completed behind schedule.
+
+Similarly, due to our principle to reuse as many types and interfaces as possible, different parts of the project share the same files in key processes. Due to needs not foreseen at the introduction of these files, some interfaces were changed midway and caused some confusion between our group members.
+
+Finally, we expect future projects to follow a higher standard of professionalism, especially regarding git-hygiene and comments. We further expect a higher commitment to code styles. Such views should be communicated thoroughly and we must confirm that they are shared among the entire group.
+
+\section{Individual Reflection}
+
+\subsection{Yang Lihan}
+
+Overall, I find the group's working dynamics enjoyable and rewarding. The ARMv8 project has been a great opportunity for all of us to share knowledge on C and computer architecture with each other. Helping our group members with their tasks and understanding of the project has both strengthened our friendship and allowed myself to improve on these fields. Meanwhile, an important learning point was that any group work should start with detailed schemes, with the range of assumed knowledge or common practice expanding along the way, as we regrettably did otherwise. Helping each other set realistic targets was important, whereas motivation at the right time is both helpful and necessary, a balance deserving a more nuanced consideration. Personally, the project has surely been a enriching and enjoyable journey, giving experience as well as confidence in future group projects.
+
+\subsection{Henry Chen}
+
+Our group collaboration was exceptionally smooth and productive. We established a clear division of tasks early on, ensuring that everyone knew their responsibilities. Throughout the project, we consistently supported each other, sharing knowledge and offering assistance whenever needed. This mutual help not only made the work more manageable but also enriched our learning experience. Each member's contribution was crucial to our success, and the positive teamwork atmosphere was truly motivating. Overall, this collaboration was a valuable and enjoyable experience, and I genuinely look forward to the opportunity to work with this group again in the future.
+
+\subsection{Andy Wang}
+
+Our group had overall good synergies and coordination. Our work was split up, and everyone was happy with what they have. We created group chats, so we can report our live editing process and communicate ideas and issue during the development. Everyone did what they can and what they’re best at. I had an enjoyable experience working in this group.
+
+\subsection{Ye Zihao}
+
+Our group collaboration was highly effective and well-organized. Early in the project, we allocated tasks efficiently, which ensured everyone knew their specific roles. Throughout our work, we maintained open lines of communication, offering help and sharing knowledge whenever we encountered challenges. This supportive dynamic helped us manage our workload better while enhancing the quality of our work. We all valued each other's contribution, and the positive and cooperative atmosphere made the project enjoyable. Overall, the experience was both valuable and fulfilling, and I have surely learned a lot during the project.
 
 \end{document}
